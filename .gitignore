@@ -1,0 +1,8 @@
+config
+node_modules
+npm-debug.log
+public
+.DS_Store
+.sass-cache
+parse.js
+config.js

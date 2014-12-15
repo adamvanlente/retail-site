@@ -1,0 +1,382 @@
+// Media Query Breakpoints
+$iphone-portrait: 320px
+$iphone-landscape: 568px
+$ipad-portrait: 569px
+$ipad-landscape: 1024px
+$desktop: 1025px
+$desktop-large: 1824px
+
+// Breakpoint function
+=break-for($device)
+
+  @if $device == standard
+    @media only screen and (min-width: $desktop)
+      @content
+
+  @if $device == standard-large
+    @media only screen and (min-width: $desktop-large)
+      @content
+
+  @if $device == iphone
+    @media only screen and (min-device-width: $iphone-portrait) and (max-device-width: $iphone-landscape)
+      @content
+    @media only screen and (min-width: $iphone-portrait) and (max-width: $iphone-landscape)
+      @content
+
+  @if $device == ipad
+    @media only screen and (min-device-width: $ipad-portrait) and (max-device-width: $ipad-landscape)
+      @content
+    @media only screen and (min-width: $ipad-portrait) and (max-width: $ipad-landscape)
+      @content
+
+// Transition
+=trans($transtype)
+  -webkit-transition: $transtype
+  -moz-transition:    $transtype
+  -o-transition:      $transtype
+  transition:         $transtype
+
+$easybreezy: ease-in-out all 0.2s
+$easyslider: all 1s cubic-bezier(0.7,0.53,0,0.87)
+
+// Colors
+$light-gray: #FAFAFA
+$med-light-gray: #F1F1F1
+$light-gray-border: #E8E1E1
+$light-gray-text: #CDC9C9
+$title-gray: #494747
+$heading-color: #5899BA
+$create-blue: rgb(98, 153, 200)
+$cancel-red: #E77575
+$go-green: rgb(85, 186, 113)
+$minty-green: rgb(102, 192, 141)
+
+// Grid measurements
+$grid: 12px
+$grid2: $grid * 2
+$doc-width: 800px
+$tablet-width: 600px
+$phone-width: 275px
+
+// Some general width constraints
+// Desktop
+$d-width: 850px
+// Tablet
+$t-width: 600px
+// Phone
+$p-width: 300px
+
+.traditional-width
+  width: $d-width
+  +break-for(ipad)
+    width: $t-width
+  +break-for(iphone)
+    width: $p-width
+
+// Fonts
+.light-font
+  font-family: "Roboto Light", sans-serif
+  font-weight: 100
+
+.standard-font
+  font-family: "Roboto", sans-serif
+
+.serif-font
+  font-family: "Playfair", serif
+
+.serif-title-font
+  font-family: "Playfair Bold", serif
+
+body
+  margin: 0
+  background-color: $light-gray
+
+.basic-button
+  -webkit-appearance: none
+  border: none
+  border-radius: 1px
+  cursor: pointer
+  +trans($easybreezy)
+
+.blockOut
+  display: none
+  position: fixed
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+
+.offClicker
+  @extend .blockOut
+  z-index: 41
+  background: rgba(255, 255, 255, 0.53)
+
+.whiteOut
+  @extend .blockOut
+  background: rgba(102, 192, 141, 0.65)
+  z-index: 11
+  +trans($easybreezy)
+
+.popupDiv
+  display: none
+  position: fixed
+  z-index: 40
+  top: 0
+  right: 0
+  left: 0
+  bottom: 0
+
+.messageHolder
+  @extend .light-font
+  font-size: 13px
+  display: block
+  position: fixed
+  left: 40%
+  right: 40%
+  padding: 8px
+  color: white
+  text-align: center
+  z-index: 25
+  +trans($easyslider)
+  +break-for(ipad)
+    left: 35%
+    right: 35%
+  +break-for(iphone)
+    left: 10%
+    right: 10%
+
+  &.invisible
+    top: -500px
+  &.visible
+    top: 10px
+  &.success
+    background: $minty-green
+  &.error
+    background: $cancel-red
+
+.timeclockPopup
+  @extend .light-font
+  display: block
+  position: fixed
+  top: 20px
+  left: 30%
+  right: 30%
+  background: white
+  padding: 24px
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2)
+
+  h1
+    display: block
+    text-align: center
+    font-size: 16px
+
+  label
+    display: block
+    color: $cancel-red
+    width: 100px
+    margin: 12px auto
+    text-align: center
+    font-size: 11px
+    cursor: pointer
+    &:hover
+      color: #333
+
+  em
+    display: block
+    width: 300px
+    margin: 0 auto
+    font-size: 12px
+    font-style: normal
+    text-align: center
+    padding: 12px
+
+  button
+    @extend .light-font
+    @extend .basic-button
+    display: block
+    padding: 8px 32px
+    width: 10px
+    margin: 0 auto
+    text-align: center
+    width: 150px
+    color: white
+
+    &.punchIn
+      background: $minty-green
+      &:hover
+        background: #333
+        color: $minty-green
+    &.punchOut
+      background: $cancel-red
+      &:hover
+        background: #333
+        color: $cancel-red
+
+.employeeHoursWorked
+  @extend .light-font
+  display: block
+  width: 800px
+  margin: 24px auto
+  background: white
+  padding: 12px
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1)
+
+  h1
+    display: block
+    font-size: 16px
+    text-align: center
+    margin: 4px
+    color: #999494
+    margin-bottom: 24px
+
+  em
+    &.closeButton
+      display: block
+      float: right
+      color: $cancel-red
+      +trans($easybreezy)
+      &:hover
+        color: #333
+        cursor: pointer
+
+  div
+    &.employeeHoursPayPeriod
+      display: block
+      text-align: center
+      margin: 24px
+
+      label
+        background: #F1F1F1
+        border: 1px solid #F1F1F1
+        border-top-left-radius: 4px
+        border-bottom-left-radius: 4px
+      em
+        background: none
+        border: 1px solid #F1F1F1
+        border-top-right-radius: 4px
+        border-bottom-right-radius: 4px
+        margin-right: 12px
+
+      label,
+      em
+        display: inline-block
+        font-size: 10px
+        padding: 4px
+        min-width: 115px
+        text-align: center
+        font-style: normal
+        color: #595454
+
+    &.employeeHoursWorkedDetail
+      display: block
+      text-align: center
+      max-height: 350px
+      overflow: scroll
+      padding: 8px
+
+      span
+        @extend .light-font
+        &.itemEntry
+          display: block
+          margin: 8px
+
+          label
+            display: inline-block
+            padding: 8px
+            font-size: 10px
+            text-align: center
+            color: white
+            min-width: 45px
+
+            &.piDateRight
+              color: $minty-green
+              background: white
+              border: 1px solid
+              border-top-right-radius: 4px
+              border-bottom-right-radius: 4px
+              margin-right: 12px
+              width: 140px
+
+            &.piDateLeft
+              color: white
+              background: $minty-green
+              border: 1px solid $minty-green
+              border-top-left-radius: 4px
+              border-bottom-left-radius: 4px
+
+            &.poDateRight
+              color: $cancel-red
+              background: white
+              border: 1px solid $cancel-red
+              border-top-right-radius: 4px
+              border-bottom-right-radius: 4px
+              margin-right: 12px
+              width: 140px
+
+            &.poDateLeft
+              color: white
+              background: $cancel-red
+              border: 1px solid $cancel-red
+              border-top-left-radius: 4px
+              border-bottom-left-radius: 4px
+
+            &.minsLeft
+              color: white
+              background: #4F97CA
+              border: 1px solid #4F97CA
+              border-top-left-radius: 4px
+              border-bottom-left-radius: 4px
+
+            &.minsRight
+              color:  #4F97CA
+              background: white
+              border: 1px solid  #4F97CA
+              border-top-right-radius: 4px
+              border-bottom-right-radius: 4px
+              margin-right: 12px
+
+            &.hrsRight
+              color: #5F5B5B
+              background: white
+              border: 1px solid #5F5B5B
+              border-top-right-radius: 4px
+              border-bottom-right-radius: 4px
+              margin-right: 12px
+
+            &.hrsLeft
+              color: white
+              background: #5F5B5B
+              border: 1px solid #5F5B5B
+              border-top-left-radius: 4px
+              border-bottom-left-radius: 4px
+
+        &.loadingMessage
+          display: block
+          text-align: center
+          margin: 8px
+          padding: 8px
+          font-size: 11px
+          border: 1px solid
+          color: #333
+
+.githubButton
+  @extend .light-font
+  @extend .basic-button
+  display: block
+  position: fixed
+  z-index: 100
+  padding: 4px
+  bottom: 10px
+  background: #333333
+  color: white
+  text-decoration: none
+  font-size: 10px
+  left: 8px
+  i
+    margin: 2px
+  &:hover
+    background: $minty-green
+    color: white
+
+.currentlySelectedDay
+  background: $minty-green
