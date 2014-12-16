@@ -4,9 +4,11 @@
 
 // Get the Parse API set up.
 var config 				= require('../config');
-
 var Parse 				= require('parse').Parse;
 Parse.initialize(config.key, config.token);
+
+// Requests module.
+var requests 			= require('../requests');
 
 module.exports = function(app) {
 
@@ -16,7 +18,12 @@ module.exports = function(app) {
 	//***********************
 	//***********************
 	app.get('/', function(req, res) {
-			res.render('index.jade');
+
+			requests.getCurrentStore(function(store) {
+
+				// Render the homepage.
+				res.render('index.jade', store);
+			});
 	});
 
 	//***********************
@@ -32,8 +39,7 @@ module.exports = function(app) {
 		// Create the route name, eg 'products' + '.jade' = products.jade.
 		var routeTemplate = routeName + '.jade';
 
-		// Render the template.
-		// res.render(routeTemplate);
+		// Render template
 		res.render('index.jade');
 	});
 };
