@@ -1,0 +1,90 @@
+.rsProduct
+  display: block
+  width: 800px
+  margin: 16px auto
+  text-align: center
+  background: #F1F1F1
+
+nav
+  display: inline-block
+  vertical-align: top
+
+.rsProduct--name
+  @extend .serif-title-font
+  display: block
+  font-size: 28px
+  padding: 4px
+  color: #4A4A4A
+  text-align: center
+  text-shadow: 0 2px 8px rgba(205, 205, 205, 0.93)
+  margin: 8px auto
+  width: 340px
+
+.rsProduct--primaryImage
+  display: inline-block
+  width: 400px
+  border: 8px solid rgb(115, 115, 115)
+  margin: 16px
+
+.rsProduct--price
+  @extend .basic-button
+  @extend .light-font
+  display: block
+  min-width: 20px
+  margin: 4px auto
+  background: none
+
+.rsProduct--price__addToCart,
+.rsProduct--price__priceEach
+  display: inline-block
+  padding: 8px
+  color: rgba(255, 255, 255, 0.87)
+  font-size: 12px
+  width: 80px
+  box-shadow: -1px 1px 1px rgba(0,0,0,0.1)
+
+.rsProduct--price__priceEach
+  background: #5662BA
+  border-bottom-left-radius: 2px
+  border-top-left-radius: 2px
+
+.rsProduct--price__addToCart
+  background: #46B67B
+  border-top-right-radius: 2px
+  border-bottom-right-radius: 2px
+  cursor: pointer
+  +trans($easybreezy)
+  &:hover
+    background: #333
+    color: #DCDCDC
+
+.rsProduct--sizes
+  @extend .light-font
+  display: block
+  margin-bottom: 12px
+
+  span
+    display: inline-block
+
+    label
+      display: inline-block
+      width: 30px
+      background: rgb(197, 197, 197)
+      color: rgb(107, 107, 107)
+      padding: 8px 4px
+      font-size: 11px
+      min-width: 32px
+      border-top-left-radius: 2px
+      border-bottom-left-radius: 2px
+
+    input
+      @extend .basic-input
+      display: inline-block
+      width: 30px
+      margin-right: 10px
+      background: rgb(223, 223, 223)
+      padding: 8px 4px
+      font-size: 11px
+      border-top-right-radius: 2px
+      border-bottom-right-radius: 2px
+      text-align: center

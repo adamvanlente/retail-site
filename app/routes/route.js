@@ -10,6 +10,10 @@ Parse.initialize(config.key, config.token);
 // Requests module.
 var requests 			= require('../requests');
 
+// Rendering module.
+var render  			= require('../render');
+
+// Main route module.
 module.exports = function(app) {
 
 	//***********************
@@ -19,11 +23,8 @@ module.exports = function(app) {
 	//***********************
 	app.get('/', function(req, res) {
 
-			requests.getCurrentStore(function(store) {
-
-				// Render the homepage.
-				res.render('index.jade', store);
-			});
+			// Render homepage.
+			render.homePage(res);
 	});
 
 	//***********************
@@ -36,10 +37,38 @@ module.exports = function(app) {
 		// Get route path
 		var routeName = req.params.routeName;
 
-		// Create the route name, eg 'products' + '.jade' = products.jade.
-		var routeTemplate = routeName + '.jade';
-
-		// Render template
-		res.render('index.jade');
+		// Render the page.
+		render.customRoute(routeName, res);
 	});
+
+	//***********************
+	//***********************
+	//**** PRODUCT **********
+	//***********************
+	//***********************
+	app.get('/product/:catalogId', function(req, res) {
+
+		// Catalog id.
+		var catalogId = req.params.catalogId;
+
+		// Render homepage.
+		render.loadProduct(catalogId, res);
+	});
+
+	//***********************
+	//***********************
+	//**** SOCIAL PRODUCT ***
+	//***********************
+	//***********************
+	app.get('/social/:orderId', function(req, res) {
+
+		// Order with social items.
+		var orderId = req.params.orderId;
+
+		// Render a social order page.
+		render.socialOrder(orderId, res);
+	});
+
+
+
 };

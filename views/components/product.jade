@@ -1,0 +1,32 @@
+//- Product page that accepts some variables and renders
+//- a product page.
+div.rsProduct
+  
+    //- Nav element that holds images for the product.
+    nav
+      each img in val.images
+      
+        - var n = 0
+        while n < 1
+          img.rsProduct--primaryImage(src="#{img}")
+          input(type="hidden", value="#{n++}")
+  
+    
+    //- Nav that holds the product name, sizes and purchase button.
+    nav      
+      div.rsProduct--name= val.name
+
+      div.rsProduct--sizes
+        if val.sizes
+          each size, sizeName in val.sizes
+            span
+              label= sizeName
+              input(type="text", class="rsProduct--size__#{sizeName}", placeholder="0")
+
+      div.rsProduct--price
+        span.rsProduct--price__priceEach
+          | $#{val.price} ea
+        span.rsProduct--price__addToCart
+          | add to cart
+    
+        

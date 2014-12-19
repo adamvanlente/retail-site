@@ -1,0 +1,104 @@
+//////////////////////////////
+// Standard retail site styles.
+//////////////////////////////
+
+.retailSite
+  display: block
+
+.retailSite--logoImg
+  display: block
+  margin: 0 auto
+  width: 200px
+
+.retailSite--header,
+.retailSite--footer
+  @extend .serif-title-font
+  @extend .norm-width
+  display: block
+  text-align: center
+  margin: 12px auto
+
+  h1
+    margin: 0 auto
+    font-size: 18px
+
+.retailSite--body
+  @extend .light-font
+  @extend .norm-width
+  display: block
+  margin: 12px auto
+
+.column-holder
+  @extend .light-font
+  @extend .norm-width
+  background: rgba(241, 241, 241, 0.35)
+  display: block
+  margin: 8px auto
+  padding: 8px
+  text-align: center
+  white-space: nowrap
+
+.column-style
+  display: inline-block
+  margin: 8px
+  text-align: justify
+  vertical-align: top
+  white-space: normal
+
+// Standard paragraph
+.retailSite--paragraph
+  @extend .light-font
+  @extend .norm-width
+  background: rgba(241, 241, 241, 0.35)
+  display: block
+  margin: 8px auto
+  padding: 8px
+
+  a
+    color: $link-blue
+    text-decoration: none
+    +trans($easybreezy)
+    &:hover
+      color: #777
+      cursor: pointer
+
+// Two column style
+.retailSite--twoColumnHolder,
+.retailSite--threeColumnHolder
+  @extend .column-holder
+
+.retailSite--twoColumnHolder__column,
+.retailSite--threeColumnHolder__column
+  @extend .column-style
+
+.retailSite--twoColumnHolder__column
+  width: 48%
+  +break-for(iphone)
+    display: block
+    width: auto
+
+.retailSite--threeColumnHolder__column
+  width: 31%
+  +break-for(iphone)
+    display: block
+    width: auto
+
+.basic-heading
+  @extend .serif-font
+  @extend .norm-width
+  display: block
+  margin: 0 auto
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+
+.retailSite--heading
+  @extend .basic-heading
+  color: #333
+  font-size: 22px
+  text-shadow: 0 1px 1px rgba(0,0,0,0.15)
+
+.retailSite--subheading
+  @extend .basic-heading
+  color: #A5A1A1
+  font-size: 16px
