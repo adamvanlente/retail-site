@@ -25,6 +25,19 @@ module.exports = {
     },
 
     /**
+    * Render the home page of the store.
+    * @function that renders the home page for the store.
+    *
+    */
+    shoppingCart: function(res) {
+      requests.getCurrentStore(function(store) {
+
+        // Render the homepage.
+        res.render('cart.jade', store);
+      });
+    },
+
+    /**
      * Render a custom route.
      * @function that renders the html for a custom route.
      * @param routeName String name of the route/path.
@@ -88,6 +101,7 @@ module.exports = {
 
                 // Begin building a social items object.
                 var socialItems = {};
+
                 for (var item in items) {
 
                   // Get the product.
@@ -113,21 +127,32 @@ module.exports = {
 
                   price = parseInt(price).toFixed(2);
 
+                  // Get array of images.
+                  var imgArray = product.design_images_list.split(',');
+                  var primaryImage = imgArray[0] || '';
+
                   // Assign the product id to an object.
                   socialItems[product.id] = {};
-                  socialItems[product.id].images =
-                      product.design_images_list.split(',');
+                  socialItems[product.id].id = product.id;
+                  socialItems[product.id].images = imgArray
+                  socialItems[product.id].primary_image = primaryImage;
                   socialItems[product.id].name = product.item_name;
                   socialItems[product.id].price = price;
                   socialItems[product.id].sizes = product.sizes || {};
                   socialItems[product.id].expiry_date = product.social_end_date;
+                  socialItems[product.id].delivery_method =
+                      product.social_delivery_method_visible;
                 }
+
+                // Update the title of this page to mention the social order.
+                store.title = order.order_name + ' at ' + store.title;
 
                 // Add social items to store object.
                 store.social_items = socialItems;
+                console.log(socialItems)
 
                 // Render the homepage.
-                res.render('product.jade', store);
+                res.render('social.jade', store);
              });
          });
      },
@@ -148,7 +173,6 @@ module.exports = {
 
                    // Initialize products object.
                    var products = {};
-                   console.log(product);
 
                    // Initialize price.
                    var price;

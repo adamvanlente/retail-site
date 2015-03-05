@@ -1,0 +1,49 @@
+.customerSigninForm
+  @extend .light-font
+  display: block
+  position: fixed
+  padding: 12px
+  background: white
+  z-index: 25
+  top: 75px
+  left: 35%
+  right: 35%
+  box-shadow: 0 2px 2px rgba(0,0,0,0.02)
+  border: 1px solid rgba(244, 242, 242, 1)
+  +break-for(iphone)
+    left: 0
+    right: 0
+
+  input
+    @extend .basic-input
+    display: block
+    border: 1px solid rgb(232, 231, 231)
+    width: 80%
+    margin: 12px auto
+    padding: 8px 12px
+    font-size: 12px
+
+.customerSigninFormButtons
+  display: block
+
+  button
+    @extend .basic-button
+    display: block
+    margin: 0 auto
+    font-size: 13px
+    color: white
+    background: rgb(65, 150, 202)
+    border-radius: 1px
+    padding: 6px 18px
+
+  label
+    display: block
+    font-size: 12px
+    padding: 8px
+    color: #333
+    margin: 0 auto
+    width: 80%
+    text-align: center
+    &:hover
+      cursor: pointer
+      text-decoration: underline

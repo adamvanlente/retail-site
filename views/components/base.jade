@@ -10,10 +10,16 @@ html(lang='en')
     meta(name="description", content="#{meta_description}")
     body
       
-      include header
+      include menu
       
-      block content
+      include header
         
       include footer
+
+      block content
         
       include scripts
+      
+      div.whiteOut
+        
+      div#messageDiv.hidden

@@ -42,7 +42,7 @@ module.exports = {
               // Return store object.
               successCb(storeObject);
           },
-          error: function(result, error) {
+          error: function(error) {
               console.log(error.message)
           }
       });
