@@ -62,7 +62,6 @@ module.exports = {
 
                 // Set the title and meta details.
                 page.title = rt.title;
-                console.log(rt);
                 page.meta_keywords = rt.meta_keywords;
                 page.meta_description = rt.meta_description;
 
@@ -149,7 +148,6 @@ module.exports = {
 
                 // Add social items to store object.
                 store.social_items = socialItems;
-                console.log(socialItems)
 
                 // Render the homepage.
                 res.render('social.jade', store);

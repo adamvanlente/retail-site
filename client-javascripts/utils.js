@@ -8,6 +8,9 @@ var retroduck = retroduck || {};
  */
 retroduck.utils = {
 
+   // Remember if mobile view has been used.
+   mobileUsed: false,
+
    // Order in which sizes should be displayed.
    orderSizeList: ['1T', '2T', '3T', '4T', '5T', '6T', 'YXS', 'YS', 'YM', 'YL',
    'YXL', 'YXXL', 'XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '1X',
@@ -18,12 +21,15 @@ retroduck.utils = {
    /** Launch a popup. **/
    launchPopup: function(classOfPopup) {
 
+     $(document.body).attr('class', 'modal-open');
+
      // Launch the elements.
      $('.whiteOut')
        .show()
        .click(function() {
          $('.whiteOut').hide();
          $('.' + classOfPopup).remove();
+         $(document.body).attr('class', '');
        });
 
      // Remove any items with this class.
@@ -31,7 +37,8 @@ retroduck.utils = {
 
      // Append the div.
      $(document.body).append($('<div>')
-       .attr('class', classOfPopup));
+       .attr('class', classOfPopup)
+       .attr('name', 'rdModalPopup'));
    },
 
    /** Launch a popup with which a customer can sign in. **/
@@ -87,6 +94,7 @@ retroduck.utils = {
        $('.customerSigninFormButtons')
          .html('')
          .append($('<button>')
+           .attr('class', 'customerSignInButton')
            .html('sign in')
            .click(function() {
              retroduck.utils.signCustomerIn();
@@ -204,7 +212,7 @@ retroduck.utils = {
      // Get form values.
      var email = $('#user_name').val();
      var pass = $('#user_pass').val();
-     var verify = $('#user_pass_2').val();
+     var secondPassword = $('#user_pass_2').val();
      var firstName = $('#first_name').val();
      var lastName = $('#last_name').val();
 
@@ -214,7 +222,7 @@ retroduck.utils = {
        return;
      }
 
-     if (pass != verify) {
+     if (pass != secondPassword) {
 
        // error message and exit
        msg = retroduck.msg.PASSWORDS_DONT_MATCH;
@@ -222,7 +230,7 @@ retroduck.utils = {
        return;
      }
 
-     if (!email || !pass || !verify) {
+     if (!email || !pass || !secondPassword) {
 
        // error message and exit
        msg = retroduck.msg.INCOMPLETE_FORM;
@@ -294,6 +302,7 @@ retroduck.utils = {
           newDbUser.set('email_address', email);
           newDbUser.set('first_name', fName);
           newDbUser.set('last_name', lName);
+          newDbUser.set('user_id', user.id);
 
           newDbUser.save(null, {
             success: function(newDbUser) {
@@ -446,6 +455,18 @@ retroduck.utils = {
      // Condition if a customer is found.
      if (retroduck.currentUser) {
 
+       // Add logout button to menu
+       if (!$('.menuLogoutLink').length || $('.menuLogoutLink').length == 0) {
+         $('.menuLinksHolder')
+            .append($('<a>')
+              .attr('class', 'menuLogoutLink')
+              .attr('href', 'javascript:void(0)')
+              .html('Logout')
+              .click(function() {
+                retroduck.utils.logUserOut();
+              }));
+       }
+
        // Get the customer attributes.
        var attribs = retroduck.currentUser.attributes;
        var name = attribs.username;
@@ -458,11 +479,6 @@ retroduck.utils = {
        // Hide sign in button and set up user icon.
        $('.userSignInIcon').hide();
        $('.userMenuIcon').show();
-
-       // Add logout function to logout button
-       $('.logoutButton').click(function() {
-         retroduck.utils.logUserOut();
-       });
 
        // If currently viewing cart, hide sign in button here as well.
        if (window.location.pathname == '/cart') {
@@ -483,6 +499,7 @@ retroduck.utils = {
 
      } else {
        $('.userMenuIcon').hide();
+       $('.menuLogoutLink').remove();
        $('.userSignInIcon')
          .show()
          .click(function() {
@@ -507,6 +524,51 @@ retroduck.utils = {
      }
    },
 
+   /**
+    * Hide any modal dialogs.
+    * @function that looks for any modals and removes them from the dom.
+    *
+    */
+   hideAllModals: function() {
+     $('[name="rdModalPopup"]').each(function(i, element) {
+       element.remove();
+     });
+   },
+
+   /**
+    * Listener for a window resize.
+    * @function that removes unwanted elements when the user resizes window.
+    *
+    */
+   windowResizer: function() {
+     var browserWidth = window.innerWidth;
+     if (browserWidth > 568) {
+       if (retroduck.utils.mobileUsed) {
+         retroduck.menu.hide();
+         $('.whiteOut').attr('class', 'whiteOut desktop');
+         retroduck.utils.mobileUsed = false;
+       }
+     } else {
+       $('.whiteOut').attr('class', 'whiteOut mobile');
+       retroduck.utils.mobileUsed = true;
+     }
+   },
+
+   /*
+    * Listener function for scrolling.
+    * @function that updates the look of the top menu based on how far the user
+    *           has scrolled the page.
+    *
+    */
+   scrollListener: function() {
+     var top = $(window).scrollTop();
+     if (top > 0) {
+       $('.menuLogo').attr('class', 'menuLogo scrolled');
+     } else {
+       $('.menuLogo').attr('class', 'menuLogo');
+     }
+   },
+
    /** Log the current user out **/
    logUserOut: function() {
      retroduck.currentUser = null;
@@ -518,4 +580,10 @@ retroduck.utils = {
 /** Check for a user and update an page items. **/
 $(document).ready(function() {
   retroduck.utils.checkForUser();
+  retroduck.utils.scrollListener();
+  window.onresize = retroduck.utils.windowResizer;
+  retroduck.utils.windowResizer();
 });
+
+/** Listen for a scroll and update the header if neccesary **/
+window.addEventListener("scroll", retroduck.utils.scrollListener);

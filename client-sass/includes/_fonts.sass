@@ -33,3 +33,27 @@
   src: url('fonts/Roboto-Regular.ttf')
   font-weight: normal
   font-style: normal
+
+.font-settings
+  font-weight: 100
+  font-size: 14px
+  +break-for(ipad)
+    font-size: 18px
+  +break-for(iphone)
+    font-size: 20px
+
+.light-font
+  @extend .font-settings
+  font-family: "Roboto Light", sans-serif
+
+.standard-font
+  @extend .font-settings
+  font-family: "Roboto", sans-serif
+
+.serif-font
+  @extend .font-settings
+  font-family: "Playfair", serif
+
+.serif-title-font
+  @extend .font-settings
+  font-family: "Playfair Bold", serif

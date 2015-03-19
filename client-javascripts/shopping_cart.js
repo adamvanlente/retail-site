@@ -45,14 +45,14 @@ retroduck.cart = {
       return;
     }
 
+    // Create a sign in area for customrs.
+    retroduck.cart.showCustomerDetailsForm(shoppingCartDiv);
+
     // Show a summary of the cart items and quantities.
     var cost = retroduck.cart.showItemSummary(cart, shoppingCartDiv);
 
     // Show a summary of costs.
     retroduck.cart.showCostSummary(cost, shoppingCartDiv);
-
-    // Create a sign in area for customrs.
-    retroduck.cart.showCustomerDetailsForm(shoppingCartDiv);
 
     // Create and show billing options.
     retroduck.cart.showCreditCardForm(shoppingCartDiv);
@@ -338,6 +338,8 @@ retroduck.cart = {
 
     // Append form to main div.
     shoppingCartDiv.append(customerDiv);
+
+    retroduck.utils.checkForUser();
   },
 
 
@@ -441,6 +443,67 @@ retroduck.cart = {
 
       // Store a global shipping status.
       retroduck.cart.hasItemsThatAreShipping = true;
+
+      retroduck.cart.fillInCurrentCustomerAddress();
+  },
+
+  /**
+   * Fill in the customer address.
+   * @function that checks for an active user, and dumps their address
+   *           into the shopping cart address form (if address exists).
+   *
+   */
+  fillInCurrentCustomerAddress: function() {
+
+    // Set address to current user address.  If we've reached this stage,
+    // order has items that are shipping.  We're now checking for a current
+    // user.  We'll fill out their address if we have one on file.
+    if (retroduck.currentUser) {
+      var eml = retroduck.currentUser.attributes.email;
+      var dbCustomer = Parse.Object.extend("dbCustomer");
+      var query = new Parse.Query(dbCustomer);
+      query.equalTo("email_address", eml);
+      query.find({
+        success: function(results) {
+          // We have this customer.  Grab address and fill it in.
+          if (results.length > 0) {
+            retroduck.cart.populateAddressForm(results[0].attributes);
+          }
+        },
+        error: function(error) {
+          // No customer exists.  Do nothing.
+        }
+      });
+    }
+  },
+
+
+  /**
+   * Populate shipping form within the shopping cart.
+   * @function that takes an address, and given any valid params, fills in the
+   *           appropriate shipping form field.
+   * @param address Object parse user/customer object.
+   *
+   */
+  populateAddressForm: function(address) {
+    if (!address) {
+      return;
+    }
+    if (address.address_one) {
+      $('#cart_address_line_one').val(address.address_one);
+    }
+    if (address.address_two) {
+      $('#cart_address_line_two').val(address.address_two);
+    }
+    if (address.address_city) {
+      $('#cart_address_line_city').val(address.address_city);
+    }
+    if (address.address_state) {
+      $('#cart_address_line_state').val(address.address_state);
+    }
+    if (address.address_zip) {
+      $('#cart_address_line_zip').val(address.address_zip);
+    }
   },
 
   /**

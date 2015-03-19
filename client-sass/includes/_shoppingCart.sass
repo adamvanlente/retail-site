@@ -18,6 +18,8 @@
     left: 10px
     right: 10px
     bottom: 10px
+    top: 10px
+    border: 1px solid #DCDCDC
 
   h1
     font-size: 16px
@@ -77,8 +79,8 @@
                 text-align: center
                 +break-for(iphone)
                   font-size: 16px
-                  padding: 4px 24px
-                  margin: 6px 16px
+                  padding: 12px 24px
+                  margin: 0px 16px
                   +trans($easybreezy)
                 &.toggleSizesUp
                   display: inline-block
@@ -150,11 +152,11 @@
 .shoppingCartPage
   display: block
   width: 40%
-  background: #f7f7f7
-  margin: 20px auto
+  margin: 70px auto
   text-align: center
   +break-for(iphone)
     width: 100%
+    margin: 100px auto
 
   h1
     @extend .light-font
@@ -166,6 +168,7 @@
     &.orderSummaryTitle
       background: $go-green
       color: rgba(255, 255, 255, 0.56)
+      margin-top: 12px
 
     &.creditCardFormTitle
       margin-top: 12px
@@ -197,6 +200,8 @@
       margin: 24px auto
       font-size: 16px
       border-radius: 6px
+      +break-for(iphone)
+        width: 90%
 
       i
         display: inline-block

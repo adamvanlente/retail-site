@@ -4,6 +4,9 @@ div.rsProduct
   
     //- Nav element that holds images for the product.
     nav
+      div.rsProduct--mobileName= val.name
+    
+    nav
       each img in val.images
       
         - var n = 0
@@ -14,7 +17,7 @@ div.rsProduct
     
     //- Nav that holds the product name, sizes and purchase button.
     nav      
-      div.rsProduct--name= val.name
+      div.rsProduct--desktopName= val.name
 
       div.rsProduct--sizes
         if val.sizes
@@ -26,8 +29,10 @@ div.rsProduct
               if val.delivery_method
                 button.rsProduct--addItemButton__addToCart(id="#{val.id}_#{sizeName}_#{val.delivery_method}", name="#{val.primary_image}", title="#{val.price}_#{val.name}")
                   i.fa.fa-plus-circle
+                  | add to cart
               else 
                 button.rsProduct--addItemButton__addToCart(id="#{val.id}_#{sizeName}", name="#{val.primary_image}", title="#{val.price}_#{val.name}")
                   i.fa.fa-plus-circle
+                  | add to cart
     
         

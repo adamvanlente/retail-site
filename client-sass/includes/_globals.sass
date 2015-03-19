@@ -74,30 +74,6 @@ $p-width: 300px
   +break-for(iphone)
     width: $p-width
 
-.font-settings
-  font-weight: 100
-  font-size: 14px
-  +break-for(ipad)
-    font-size: 18px
-  +break-for(iphone)
-    font-size: 20px
-
-.light-font
-  @extend .font-settings
-  font-family: "Roboto Light", sans-serif
-
-.standard-font
-  @extend .font-settings
-  font-family: "Roboto", sans-serif
-
-.serif-font
-  @extend .font-settings
-  font-family: "Playfair", serif
-
-.serif-title-font
-  @extend .font-settings
-  font-family: "Playfair Bold", serif
-
 .basic-input
   @extend .light-font
   -webkit-appearance: none
@@ -111,9 +87,13 @@ $p-width: 300px
 .whiteOut
   display: none
   position: fixed
-  z-index: 10
   top: 0
   left: 0
   right: 0
   bottom: 0
   background: rgba(255,255,255,0.5)
+
+  &.desktop
+    z-index: 4
+  &.mobile
+    z-index: 3

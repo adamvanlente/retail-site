@@ -2,8 +2,10 @@ extends components/base
 
 block append content
 
-  div.socialDesc
-    
-  if social_items
-    each val, index in social_items
-      include components/product
+  div.productPage
+
+    div.socialDesc
+      
+    if social_items
+      each val, index in social_items
+        include components/product
