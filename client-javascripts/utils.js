@@ -18,6 +18,13 @@ retroduck.utils = {
    '5X', 'XXXXXL', '5XL', '6X', '6XL', 'XXXXXXL', '7X', '7XL',
    'XXXXXXXL', '8X', '8XL', 'XXXXXXXXL'],
 
+   // States that need to be charged sales tax.
+   TAXABLE_STATES: {
+     'MI': 0.06,
+     'Michigan': 0.06,
+     'MICHIGAN': 0.06
+   },
+
    /** Launch a popup. **/
    launchPopup: function(classOfPopup) {
 
@@ -482,6 +489,11 @@ retroduck.utils = {
 
        // If currently viewing cart, hide sign in button here as well.
        if (window.location.pathname == '/cart') {
+
+         // Fill in address with current user.
+         retroduck.cart.fillInCurrentCustomerAddress();
+
+         // Update the customer div to show the current customer.
          $('.customerFormDiv')
            .html('')
            .append($('<span>')
@@ -508,6 +520,11 @@ retroduck.utils = {
 
          // If currently viewing cart, show sign in button here.
          if (window.location.pathname == '/cart') {
+
+           // Clear the address form.
+           retroduck.cart.clearAddressForm();
+
+           // Set user div for easy login/signup.
            $('.customerFormDiv')
              .html('')
              .append($('<button>')
@@ -581,8 +598,11 @@ retroduck.utils = {
 $(document).ready(function() {
   retroduck.utils.checkForUser();
   retroduck.utils.scrollListener();
-  window.onresize = retroduck.utils.windowResizer;
   retroduck.utils.windowResizer();
+  window.onresize = retroduck.utils.windowResizer;
+  $('.homePageLink').click(function() {
+    window.location = '/';
+  })
 });
 
 /** Listen for a scroll and update the header if neccesary **/

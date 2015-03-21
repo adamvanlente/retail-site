@@ -25,7 +25,7 @@ div.rsProduct
             span.rsProduct--addItemButton
               label.rsProduct--addItemButton__sizeName= sizeName
               label.rsProduct--addItemButton__productPrice
-                | $#{val.price}/ea
+                | $#{sprintf(format, val.price)}/ea
               if val.delivery_method
                 button.rsProduct--addItemButton__addToCart(id="#{val.id}_#{sizeName}_#{val.delivery_method}", name="#{val.primary_image}", title="#{val.price}_#{val.name}")
                   i.fa.fa-plus-circle

@@ -376,11 +376,14 @@ retroduck.cart = {
     // Do not include shipping options if no items are eligible.
     if (!hasShippedItems) {
       retroduck.cart.setShippingFormEmpty(shippingDetailsDiv);
-      return;
-    }
+    } else {
 
-    // Set the form fields for shipping info.
-    retroduck.cart.setShippingFormFields(shippingDetailsDiv);
+      // Store a global shipping status.
+      retroduck.cart.hasItemsThatAreShipping = true;
+
+      // Set the form fields for shipping info.
+      retroduck.cart.setShippingFormFields(shippingDetailsDiv);
+    }
   },
 
   /**
@@ -441,9 +444,7 @@ retroduck.cart = {
         .attr('type', 'text')
         .attr('placeholder', retroduck.msg.SHIPPING_ADDRESS_LINE_ZIP));
 
-      // Store a global shipping status.
-      retroduck.cart.hasItemsThatAreShipping = true;
-
+      // Fill in the address with the current customer.
       retroduck.cart.fillInCurrentCustomerAddress();
   },
 
@@ -467,6 +468,7 @@ retroduck.cart = {
         success: function(results) {
           // We have this customer.  Grab address and fill it in.
           if (results.length > 0) {
+            retroduck.currentDatabaseCustomer = results[0];
             retroduck.cart.populateAddressForm(results[0].attributes);
           }
         },
@@ -486,6 +488,7 @@ retroduck.cart = {
    *
    */
   populateAddressForm: function(address) {
+
     if (!address) {
       return;
     }
@@ -503,6 +506,29 @@ retroduck.cart = {
     }
     if (address.address_zip) {
       $('#cart_address_line_zip').val(address.address_zip);
+    }
+  },
+
+  /**
+   * Clear address form.
+   * @function that clears the values of the shipping address form.
+   *
+   */
+  clearAddressForm: function() {
+    if ($('#cart_address_line_one')) {
+      $('#cart_address_line_one').val('');
+    }
+    if ($('#cart_address_line_two')) {
+      $('#cart_address_line_two').val('');
+    }
+    if ($('#cart_address_line_city')) {
+      $('#cart_address_line_city').val('');
+    }
+    if ($('#cart_address_line_state')) {
+      $('#cart_address_line_state').val('');
+    }
+    if ($('#cart_address_line_zip')) {
+      $('#cart_address_line_zip').val('');
     }
   },
 
@@ -533,28 +559,156 @@ retroduck.cart = {
    */
   launchCartConfirmation: function() {
 
-    // Validate all of the form fields and information.
-    // retroduck.cart.hasItemsThatAreShipping;
-    var msg;
+    // First, check for a user.
+    if (!retroduck.currentUser) {
+      var msg = retroduck.msg.NO_USER_LOGGED_IN;
+      retroduck.utils.errorMessage(msg);
+      return;
+    }
 
+    // Validate credit card form.
+    // var ccValid = retroduck.cart.validateCreditCardForm();
+    var ccValid = true;
+
+    // Make sure the address is valid.
+    var addressValid = retroduck.cart.validateShippingAddress();
+
+    if (ccValid && addressValid) {
+
+      // Confirm that the address is valid according to USPS.
+      retroduck.cart.verifyAddressWithUSPS(function() {
+
+        // Launch summary div.
+        retroduck.cart.showConfirmationSummary();
+      });
+    }
+  },
+
+  verifyAddressWithUSPS: function(cb) {
+
+    // Assemble the USPS request.
+    var lineOne = $('#cart_address_line_one').val();
+    var lineTwo = $('#cart_address_line_two').val();
+    var street = lineTwo == '' ? lineOne : lineOne + ' ' + lineTwo;
+    var city = $('#cart_address_line_city').val();
+    var state = $('#cart_address_line_state').val();
+    var zip = $('#cart_address_line_zip').val();
+
+    var requestUrl = '/validateAddress/' + street + '/' +
+        city + '/' + state +'/' + zip;
+    requestUrl = requestUrl.replace(/#/g, 'apt')
+
+    $.ajax({
+      url: requestUrl,
+      success: function(response) {
+
+        response = response.address;
+        if (response.success) {
+          retroduck.currentDatabaseCustomer.set('address_one', response.line_one);
+          retroduck.currentDatabaseCustomer.set('address_two', response.line_two);
+          retroduck.currentDatabaseCustomer.set('address_city', response.city);
+          retroduck.currentDatabaseCustomer.set('address_state', response.state);
+          retroduck.currentDatabaseCustomer.set('address_zip', response.zip);
+          retroduck.currentDatabaseCustomer.save(null, {
+            success: function() {
+              retroduck.cart.populateAddressForm({
+                address_one: response.line_one,
+                address_two: response.line_two,
+                address_city: response.city,
+                address_state: response.state,
+                address_zip: response.zip
+              });
+              cb();
+            }
+          });
+        } else {
+          cb();
+        }
+      },
+      error: function(e) {
+        cb();
+      }
+    });
+  },
+
+  /**
+   * Validate credit card form.
+   * @function that checks to see if credit card form values are valid and
+   *           quits/returns messages if not.
+   *
+   */
+  validateCreditCardForm: function() {
+
+    // Define form fields.
     var ccField = $('#credit_card_number');
+    var monthField = $('#credit_card_month');
+    var yearField = $('#credit_card_year');
+    var cvcField = $('#credit_card_cvc');
+    var zipField = $('#credit_card_zip');
+    var msg;
 
     // Check if CC has been entered.
     if (!ccField.val()) {
       msg = retroduck.msg.INVALID_CREDIT_CARD_NUMBER;
       retroduck.utils.errorMessage(msg);
-      return;
+      return false;
     }
 
     // Validate length of CC number
     if (ccField.val().length != 16 || isNaN(ccField.val())) {
       msg = retroduck.msg.INVALID_CREDIT_CARD_NUMBER;
       retroduck.utils.errorMessage(msg);
-      return;
+      return false;
     }
 
-    // Launch summary div.
-    retroduck.cart.showConfirmationSummary();
+    // Validate Month and Year
+    if (!monthField.val() || !yearField.val() ||
+        isNaN(yearField.val()) || isNaN(monthField.val())) {
+          msg = retroduck.msg.INVALID_CREDIT_CARD_DATE;
+          retroduck.utils.errorMessage(msg);
+          return false;
+    }
+
+    // Validate CVC field.
+    if (!cvcField.val()) {
+      msg = retroduck.msg.INVALID_CREDIT_CARD_CVC;
+      retroduck.utils.errorMessage(msg);
+      return false;
+    }
+
+    // Validate zip code.
+    if (!zipField.val()) {
+      msg = retroduck.msg.INVALID_CREDIT_CARD_ZIP;
+      retroduck.utils.errorMessage(msg);
+      return false;
+    }
+
+    return true;
+  },
+
+  /**
+   * Validate shipping address.
+   * @function that checks the fields of the shipping form for valid values.
+   *
+   */
+  validateShippingAddress: function() {
+
+    if (!retroduck.cart.hasItemsThatAreShipping) {
+      return true;
+    }
+
+    var msg;
+    if (!$('#cart_address_line_one').val() ||
+        !$('#cart_address_line_city').val() ||
+        !$('#cart_address_line_state').val() ||
+        !$('#cart_address_line_zip').val()) {
+      msg = retroduck.msg.INVALID_SHIPPING_ADDRESS;
+      retroduck.utils.errorMessage(msg);
+      return false
+    }
+
+    // If no failures found, move on.
+    return true;
   },
 
   showConfirmationSummary: function() {
@@ -563,41 +717,121 @@ retroduck.cart = {
     var cart = retroduck.utils.getOneCookie('cart');
     cart = JSON.parse(cart);
 
+    // Define address.
+    var lineOne = $('#cart_address_line_one').val();
+    var lineTwo = $('#cart_address_line_two').val();
+    var lineCity = $('#cart_address_line_city').val();
+    var lineState = $('#cart_address_line_state').val();
+    var lineZip = $('#cart_address_line_zip').val();
+    var streetString = lineTwo == '' ? lineOne : lineOne + '<br>' + lineTwo;
+
+    // Set the subtotal.
+    var subTotal = 0;
+    for (var item in cart.items) {
+      var product = cart.items[item];
+      subTotal += (parseFloat(product.price) * parseInt(product.totalItems));
+    }
+
+    // Set Sales Tax
+    var tax = 0;
+    if (retroduck.utils.TAXABLE_STATES[lineState]) {
+      tax = subTotal * retroduck.utils.TAXABLE_STATES[lineState];
+    }
+
     // Append a popup for confirmation.
     $("body")
       .append($('<div>')
-        .attr('class', 'confirmCheckoutPopupDialog'));
+        .attr('class', 'confirmCheckoutPopupDialog')
+        .attr('name', 'rdModalPopup'));
 
     // Append cart info to popup.
     $('.confirmCheckoutPopupDialog')
+      .append($('<h3>')
+        .html(retroduck.msg.CONFIRM_CHECKOUT_HEADER));
 
-      .append($('<span>')
-        .attr('class', 'cartSubtotal')
-        .append($('<label>')
-          .html('subtotal'))
-        .append($('<label>')
-          .html('$10')))
+    // Append cart info to popup.
+    var shipping = 0;
+    if (retroduck.cart.hasItemsThatAreShipping) {
 
-      .append($('<span>')
-        .attr('class', 'cartShipping')
-        .append($('<label>')
-          .html('shipping'))
-        .append($('<label>')
-          .html('$10')))
+      // Calculate shipping.
+      shipping = cart.totalItems > 24 ? 20.00 : 8.00;
 
-      .append($('<span>')
-        .attr('class', 'cartTax')
-        .append($('<label>')
-          .html('tax'))
-        .append($('<label>')
-          .html('$10')))
+      // Append shipping address.
+      $('.confirmCheckoutPopupDialog')
+        .append($('<section>')
+          .attr('class', 'confirmCartAddress')
+          .append($('<header>')
+            .html('shipping to'))
+          .append($('<label>')
+            .html(streetString))
+          .append($('<label>')
+            .html(lineCity + ', ' + lineState + ' ' + lineZip)));
+    }
 
-      .append($('<span>')
-        .attr('class', 'cartGrandTotal')
-        .append($('<label>')
-          .html('grand total'))
-        .append($('<label>')
-          .html('$10')));
+    // Set grand total.
+    retroduck.cart.grandTotal =
+        parseFloat(tax) + parseFloat(subTotal) + parseFloat(shipping);
+
+    // Append note about costs.
+    $('.confirmCheckoutPopupDialog')
+       .append($('<section>')
+         .attr('class', 'confirmCartCosts')
+         .append($('<header>')
+           .html('cart total'))
+
+         .append($('<span>')
+           .attr('class', 'standard')
+           .append($('<label>')
+             .html('subtotal'))
+           .append($('<em>')
+             .html('$' + subTotal.toFixed(2))))
+
+         .append($('<span>')
+           .attr('class', 'standard')
+           .append($('<label>')
+             .html('tax'))
+           .append($('<em>')
+             .html('$' + tax.toFixed(2))))
+
+         .append($('<span>')
+           .attr('class', 'standard')
+           .append($('<label>')
+             .html('shipping'))
+           .append($('<em>')
+             .html('$' + shipping.toFixed(2))))
+
+         .append($('<span>')
+           .attr('class', 'cartCostConfirmGrandTotal')
+           .append($('<label>')
+             .html('total'))
+           .append($('<em>')
+             .html('$' + retroduck.cart.grandTotal.toFixed(2))))
+         );
+
+     // Append credit card note.
+     var lastFourCard = $('#credit_card_number').val().slice(-4);
+     $('.confirmCheckoutPopupDialog')
+       .append($('<section>')
+         .attr('class', 'confirmCardDetails')
+         .append($('<label>')
+           .html('card ending in **' + lastFourCard)));
+
+     $('.confirmCheckoutPopupDialog')
+       .append($('<section>')
+         .attr('class', 'confirmCartButtons')
+         .append($('<button>')
+           .attr('class', 'cartPayButton')
+           .html(retroduck.msg.CART_CONFIRM_BUY)
+           .click(function() {
+             retroduck.cart.assembleAndPayForOrder();
+           }))
+         .append($('<button>')
+           .attr('class', 'cartCancelButton')
+           .html(retroduck.msg.CART_CANCEL_BUY)
+           .click(function() {
+             $('.whiteOut').click();
+           })));
+
 
     // Show whiteout div for use as offclick.
     $('.whiteOut')
@@ -1150,6 +1384,15 @@ retroduck.cart = {
       .append($('<span>')
         .attr('class', 'noShoppingCartItems')
         .html('Your shopping cart is empty.  Add some stuff!'));
+  },
+
+  assembleAndPayForOrder: function() {
+
+    var total = retroduck.cart.grandTotal;
+    var isShipping = retroduck.cart.hasItemsThatAreShipping;
+    console.log(total, isShipping)
+    console.log('checking out')
+
   }
 
 };

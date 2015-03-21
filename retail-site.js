@@ -9,6 +9,8 @@ var bodyParser   = require('body-parser');
 
 // Set up the express application.
 var app = express();
+app.locals.sprintf = require('sprintf-js').sprintf;
+app.locals.format = "%d";
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser());

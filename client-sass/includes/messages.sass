@@ -15,6 +15,8 @@
   +break-for(iphone)
     left: 0
     right: 0
+    font-size: 14px
+    padding: 32px
 
   &.hidden
     top: -500px
@@ -22,7 +24,11 @@
   &.successMessage
     top: 35px
     background: $go-green
+    +break-for(iphone)
+      top: 0px
 
   &.errorMessage
     top: 35px
     background: $cancel-red
+    +break-for(iphone)
+      top: 0px

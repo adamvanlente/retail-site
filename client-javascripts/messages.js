@@ -8,6 +8,10 @@ var retroduck = retroduck || {};
  */
 retroduck.msg = {
 
+  // No user is logged in.
+  NO_USER_LOGGED_IN: 'You are not logged in.  Please quickly log in or create' +
+    ' an account',
+
   // Message user sees as a disclaimer to their shopping cart total.
   SHOPPING_CART_DISCLAIMER: '* plus applicable taxes and shipping',
 
@@ -16,8 +20,13 @@ retroduck.msg = {
 
   // Title that appears at the top of the popup version of the shopping cart.
   SHOPPING_CART_POPUP_TITLE: 'Your shopping cart',
+  CONFIRM_CHECKOUT_HEADER: 'Confirm cart details',
   CART_POPUP_TOGGLE_SIZE_UP: '<i class="fa fa-plus-circle"></i>',
   CART_POPUP_TOGGLE_SIZE_DOWN: '<i class="fa fa-minus-circle"></i>',
+
+  // Cart confirmation screen.
+  CART_CONFIRM_BUY: 'Ok buy the stuff',
+  CART_CANCEL_BUY: 'cancel',
 
   // Shopping cart title for order summary section.
   ORDER_SUMMARY_TITLE: 'Order summary <i class="fa fa-list"></i>',
@@ -35,10 +44,8 @@ retroduck.msg = {
   CREDIT_CARD_ZIP: 'ZIP',
   INVALID_CREDIT_CARD_NUMBER: 'Your card number appears to be invalid. ' +
       'Please double check and ensure that it is correct',
-  INVALID_CREDIT_CARD_MONTH: 'Your card expiry month appears to be invalid. ' +
-      'Please double check and ensure that it is correct',
-  INVALID_CREDIT_CARD_YEAR: 'Your card expiry year appears to be invalid. ' +
-      'Please double check and ensure that it is correct',
+  INVALID_CREDIT_CARD_DATE: 'Your card expiry month or year appear to be' +
+      ' invalid. Please double check and ensure that it is correct',
   INVALID_CREDIT_CARD_CVC: 'Your card CVC number appears to be invalid. ' +
       'Please double check and ensure that it is correct',
   INVALID_CREDIT_CARD_ZIP: 'Your card zip code appears to be invalid. ' +
@@ -53,6 +60,7 @@ retroduck.msg = {
   SHIPPING_ADDRESS_LINE_CITY: 'City',
   SHIPPING_ADDRESS_LINE_STATE: 'State',
   SHIPPING_ADDRESS_LINE_ZIP: 'Zip',
+  INVALID_SHIPPING_ADDRESS: 'Please complete the entire shipping form',
 
   // Confirm cart billing/shipping button text.
   CONFIRM_CART_BUTTON:
