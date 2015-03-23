@@ -214,11 +214,17 @@ retroduck.cart = {
     return totalCost;
   },
 
+  /**
+   * Hide or show the shipping form.
+   * @function that checks to see if the shipping form should be visible.
+   *           Some orders have no items that are shipping, so we check that
+   *           there are shipped items on the order before showing the form.
+   *
+   */
   updateVisibilityOfShippingForm: function() {
 
     // Iterate over shipping identifiers and determine if shipping form's
     // visibility should be toggled on/off.
-
     var hideShipping = true;
 
     $('.shippingIdentifierEm').each(function(i, el) {
@@ -326,6 +332,12 @@ retroduck.cart = {
     shoppingCartDiv.append(billingDetailsDiv);
   },
 
+  /**
+   * Show form for entering customer details.
+   * @function that reveals the form for entering customer details.
+   * @param shoppingCartDiv Object dom element to append to
+   *
+   */
   showCustomerDetailsForm: function(shoppingCartDiv) {
 
     // Set a header for the summary.
@@ -341,7 +353,6 @@ retroduck.cart = {
 
     retroduck.utils.checkForUser();
   },
-
 
   /**
    * Show a form for the credit card info.
@@ -479,7 +490,6 @@ retroduck.cart = {
     }
   },
 
-
   /**
    * Populate shipping form within the shopping cart.
    * @function that takes an address, and given any valid params, fills in the
@@ -584,6 +594,12 @@ retroduck.cart = {
     }
   },
 
+  /**
+   * Verify address provided by customer
+   * @function that takes user's address and verifies it with USPS.
+   * @param cb Object callback funtion
+   *
+   */
   verifyAddressWithUSPS: function(cb) {
 
     // Assemble the USPS request.
@@ -711,6 +727,11 @@ retroduck.cart = {
     return true;
   },
 
+  /**
+   * Show the cart cummary.
+   * @function that shows the shopping cart summary
+   *
+   */
   showConfirmationSummary: function() {
 
     // Get cart cookie.
@@ -840,89 +861,6 @@ retroduck.cart = {
         $('.confirmCheckoutPopupDialog').remove();
         $('.whiteOut').hide();
       });
-  },
-
-  /** Update the shopping cart icon. **/
-  updateCartIcon: function() {
-
-    // Get cart cookie.
-    var cart = retroduck.utils.getOneCookie('cart');
-    cart = JSON.parse(cart);
-
-    // Set cart total.
-    var cartTotal = 0;
-
-    // Iterate over all items.
-    for (var item in cart.items) {
-      cartTotal += parseInt(cart.items[item].totalItems);
-    }
-
-    // Set the cart icon.
-    $('.shoppingCartMenuIcon--count')
-      .html(cartTotal);
-  },
-
-  /** Show the user their shopping cart. **/
-  show: function() {
-
-    // Launch the popup.
-    retroduck.utils.launchPopup('shoppingCartDialog');
-
-    // Set the cart heading.
-    $('.shoppingCartDialog')
-      .html('')
-      .append($('<h1>')
-        .html(retroduck.msg.SHOPPING_CART_POPUP_TITLE))
-      .append($('<div>')
-        .attr('class', 'shoppingCartItemsHolder'));
-
-    // Get the shopping cart.
-    var cart = retroduck.utils.getOneCookie('cart');
-
-    // Case for no cart at all.
-    if (!cart) {
-      retroduck.cart.emptyCartMessage();
-      return;
-    }
-
-    // Turn the cart into an object.
-    cart = JSON.parse(cart);
-
-    // Keep count of items.
-    var uniqueProducts = 0;
-    var totalItems = 0;
-    var cartSubtotal = 0;
-
-    // Go over the items.
-    for (var item in cart.items) {
-      var product = cart.items[item];
-      if (product.sizes && product.sizes.length > 0) {
-
-        // Product is ok, keep track of unique products in cart.
-        uniqueProducts++;
-
-        // Increment total items.
-        totalItems = parseInt(product.totalItems);
-
-        // Get product price and increment total price.
-        var productPrice = (parseInt(product.totalItems) *
-            parseFloat(product.price)).toFixed(2);
-
-        cartSubtotal = (parseFloat(cartSubtotal) +
-            parseFloat(productPrice)).toFixed(2);
-
-        // Append a span for the product.
-        retroduck.cart.appendProductSpanToCartPopup(
-            product, uniqueProducts, item);
-      }
-    }
-
-    // Case for no sizes for any product.
-    if (uniqueProducts == 0) {
-      retroduck.cart.emptyCartMessage();
-    } else {
-      retroduck.cart.setCartPopupSummary(totalItems, cartSubtotal);
-    }
   },
 
   /**
@@ -1378,6 +1316,23 @@ retroduck.cart = {
     });
   },
 
+
+  /**
+   * Prepare database order object and commit payment.
+   * @function that takes shopping cart contents, converts them to a database
+   *           ready json object, and pays for the order (or shows message that
+   *           payment was not successful).
+   *
+   */
+  assembleAndPayForOrder: function() {
+
+    var total = retroduck.cart.grandTotal;
+    var isShipping = retroduck.cart.hasItemsThatAreShipping;
+    console.log(total, isShipping)
+    console.log('checking out')
+
+  },
+
   /** Show a message that the cart is empty. **/
   emptyCartMessage: function() {
     $('.shoppingCartDialog')
@@ -1386,18 +1341,88 @@ retroduck.cart = {
         .html('Your shopping cart is empty.  Add some stuff!'));
   },
 
-  assembleAndPayForOrder: function() {
+  /** Update the shopping cart icon. **/
+  updateCartIcon: function() {
 
-    var total = retroduck.cart.grandTotal;
-    var isShipping = retroduck.cart.hasItemsThatAreShipping;
-    console.log(total, isShipping)
-    console.log('checking out')
+    // Get cart cookie.
+    var cart = retroduck.utils.getOneCookie('cart');
+    cart = JSON.parse(cart);
 
-  }
+    // Set cart total.
+    var cartTotal = 0;
+
+    // Iterate over all items.
+    for (var item in cart.items) {
+      cartTotal += parseInt(cart.items[item].totalItems);
+    }
+
+    // Set the cart icon.
+    $('.shoppingCartMenuIcon--count')
+      .html(cartTotal);
+  },
+
+  /** Show the user their shopping cart. **/
+  show: function() {
+
+    // Launch the popup.
+    retroduck.utils.launchPopup('shoppingCartDialog');
+
+    // Set the cart heading.
+    $('.shoppingCartDialog')
+      .html('')
+      .append($('<h1>')
+        .html(retroduck.msg.SHOPPING_CART_POPUP_TITLE))
+      .append($('<div>')
+        .attr('class', 'shoppingCartItemsHolder'));
+
+    // Get the shopping cart.
+    var cart = retroduck.utils.getOneCookie('cart');
+
+    // Case for no cart at all.
+    if (!cart) {
+      retroduck.cart.emptyCartMessage();
+      return;
+    }
+
+    // Turn the cart into an object.
+    cart = JSON.parse(cart);
+
+    // Keep count of items.
+    var uniqueProducts = 0;
+    var cartSubtotal = 0;
+
+    // Go over the items.
+    for (var item in cart.items) {
+      var product = cart.items[item];
+      if (product.sizes && product.sizes.length > 0) {
+
+        // Product is ok, keep track of unique products in cart.
+        uniqueProducts++;
+
+        // Get product price and increment total price.
+        var productPrice = (parseInt(product.totalItems) *
+            parseFloat(product.price)).toFixed(2);
+
+        cartSubtotal = (parseFloat(cartSubtotal) +
+            parseFloat(productPrice)).toFixed(2);
+
+        // Append a span for the product.
+        retroduck.cart.appendProductSpanToCartPopup(
+            product, uniqueProducts, item);
+      }
+    }
+
+    // Case for no sizes for any product.
+    if (uniqueProducts == 0) {
+      retroduck.cart.emptyCartMessage();
+    } else {
+      retroduck.cart.setCartPopupSummary(cart.totalItems, cartSubtotal);
+    }
+  },
 
 };
 
-// When any page loads, update the shopping cart icon.
+// When any page loads, update some shopping cart details.
 $(document).ready(function() {
 
   // Update the shopping cart icon.

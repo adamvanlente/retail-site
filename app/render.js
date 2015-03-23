@@ -32,8 +32,21 @@ module.exports = {
     shoppingCart: function(res) {
       requests.getCurrentStore(function(store) {
 
-        // Render the homepage.
+        // Render the shopping cart.
         res.render('cart.jade', store);
+      });
+    },
+
+    /**
+    * Render the user's orders.
+    * @function that renders customer order page.
+    *
+    */
+    myOrders: function(res) {
+      requests.getCurrentStore(function(store) {
+
+        // Render the user's order page.
+        res.render('myOrders.jade', store);
       });
     },
 
@@ -95,6 +108,10 @@ module.exports = {
 
              requests.getSocialItems(orderId, function(results) {
                 var order = results[0].attributes;
+
+                // Set some store params
+                store.order_name = order.order_name
+
                 var items = order.items || '{}';
                 items = JSON.parse(items);
 
@@ -106,25 +123,10 @@ module.exports = {
                   // Get the product.
                   var product = items[item];
 
+                  // console.log(product)
+
                   // Initialize price.
-                  var price;
-
-                  // Set price as sale, social or regular price.
-                  if (product.product_socialprice &&
-                      product.product_socialprice != '' &&
-                      product.product_socialprice != 0) {
-                        price = product.product_socialprice;
-                      } else {
-                        if (product.product_saleprice &&
-                            product.product_saleprice != '' &&
-                            product.product_saleprice != 0) {
-                              price = product.product_saleprice;
-                            } else {
-                              price = product.product_price;
-                            }
-                      }
-
-                  price = parseInt(price).toFixed(2);
+                  var price = getProductPrice(product);
 
                   // Get array of images.
                   var imgArray = product.design_images_list.split(',');
@@ -139,6 +141,7 @@ module.exports = {
                   socialItems[product.id].price = price;
                   socialItems[product.id].sizes = product.sizes || {};
                   socialItems[product.id].expiry_date = product.social_end_date;
+                  socialItems[product.id].desc = product.product_socialmessage;
                   socialItems[product.id].delivery_method =
                       product.social_delivery_method_visible;
                 }
@@ -172,25 +175,8 @@ module.exports = {
                    // Initialize products object.
                    var products = {};
 
-                   // Initialize price.
-                   var price;
-
-                   // Set price as sale, social or regular price.
-                   if (product.product_socialprice &&
-                     product.product_socialprice != '' &&
-                     product.product_socialprice != 0) {
-                       price = product.product_socialprice;
-                     } else {
-                       if (product.product_saleprice &&
-                         product.product_saleprice != '' &&
-                         product.product_saleprice != 0) {
-                           price = product.product_saleprice;
-                         } else {
-                           price = product.product_price;
-                         }
-                       }
-
-                   price = parseInt(price).toFixed(2);
+                   // Product price.
+                   var price = getProductPrice(product);
 
                    // Assign the product id to an object.
                    products[product.id] = {};
@@ -206,5 +192,114 @@ module.exports = {
                    res.render('product.jade', store);
            });
          });
+     },
+
+     /** Function for formatting a USPS API Address Validation call **/
+    formatAddressValidationRequest: function(street, city, state, zip) {
+     	var baseUrl = 'http://production.shippingapis.com/ShippingAPITest.dll?';
+     	var apiCall ='API=Verify&XML=<AddressValidateRequest%20USERID="' +
+     			config.usps_api_key + '">';
+     	var xml 		= '<Address><Address1>' + street + '</Address1><Address2>' +
+     			'</Address2><City>' + city + '</City><State>' + state + '</State>' +
+     			'<Zip5>' + zip + '</Zip5><Zip4></Zip4></Address>' +
+     			'</AddressValidateRequest>';
+     	return baseUrl + apiCall + xml;
+     },
+
+     /** Format an xml address response from USPS to JSON **/
+     formatAddressValidationResponse: function(xml) {
+
+     	// Check for an error.
+     	if (xml.split('<Error>')[1]) {
+     		var error = xml.split('<Description>')[1].split('</Description>')[0];
+     		error = 'Error with address: ' + error;
+     		return {
+     			message: error,
+     			success: false
+     		}
+     	}
+
+     	// Parse response from USPS
+     	var a1 		 = xml.split('<Address1>')[1];
+     	if (a1) {
+     		a1 = a1.split('</Address1>')[0];
+     	}
+
+     	var a2 		 = xml.split('<Address2>')[1];
+     	if (a2) {
+     		a2 = a2.split('</Address2>')[0];
+     	}
+
+     	// Address1 and Address2 tags seem unpredictable.  Build a street string
+     	// based solely on what is returned.
+     	var lineOne = '';
+     	var lineTwo = '';
+
+     	if (a1 && a2) {
+     		lineOne = a2;
+     		lineTwo = a1;
+     	} else if (!a1 && !a2){
+     		return {
+     			message: 'Error with address: Address not found.',
+     			success: false
+     		}
+     	} else {
+     		if (a1) {
+     			lineOne = a1;
+     		}
+     		if (a2) {
+     			lineOne = a2;
+     		}
+     	}
+
+     	var aCity  = xml.split('<City>')[1].split('</City>')[0];
+     	var aState = xml.split('<State>')[1].split('</State>')[0];
+     	var aZip   = xml.split('<Zip5>')[1].split('</Zip5>')[0];
+
+     	// Return object from formatted address.
+     	return {
+     		line_one: lineOne,
+     		line_two: lineTwo,
+     		city: aCity,
+     		state: aState,
+     		zip: aZip,
+     		success: true
+     	}
      }
 };
+
+/** Get the relevant price from a product. **/
+function getProductPrice(product) {
+
+  var price;
+
+  // Set price as sale, social or regular price.
+  if (product.product_socialprice &&
+    product.product_socialprice != '' &&
+    product.product_socialprice != 0) {
+      price = product.product_socialprice;
+    } else {
+      if (product.product_saleprice &&
+        product.product_saleprice != '' &&
+        product.product_saleprice != 0) {
+          price = product.product_saleprice;
+        } else {
+          price = product.product_price;
+        }
+      }
+
+  return parseFloat(price).toFixed(2);
+}
+
+/** Build a new object to represent a product.  Used for jade template **/
+function buildProductObject(product, price) {
+  var products = {};
+  products[product.id] = {};
+  products[product.id].images = product.design_images_list.split(',');
+  products[product.id].name = product.item_name;
+  products[product.id].price = price;
+  products[product.id].sizes = product.sizes || {};
+  products[product.id].expiry_date = product.social_end_date;
+
+  return products;
+}

@@ -49,6 +49,38 @@ module.exports = {
   },
 
   /**
+   * Get the current store
+   * @function that gets all the details about the current store.
+   *
+   */
+  getUsersOrders: function(emailAddress, successCb) {
+
+      // Build a query from the object type.
+      var DbObject = Parse.Object.extend('dbOrder');
+      var query = new Parse.Query(DbObject);
+
+      // Always sort newest first.
+      query.descending("due_date");
+      query.matches('cust_email', emailAddress);
+
+      // Perform the queries and continue with the help of the callback functions.
+      query.find({
+          success: function(results) {
+              successCb({
+                success: true,
+                results: results
+              });
+          },
+          error: function(error) {
+              successCb({
+                success: false,
+                results: []
+              });
+          }
+      });
+  },
+
+  /**
    * Get social items from an order.
    * @function that shows all social items for a particular order.
    * @param orderId String readable RD order id.

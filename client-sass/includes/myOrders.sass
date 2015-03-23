@@ -1,0 +1,52 @@
+.myOrdersNoOrdersFoundMessage,
+.myOrdersNoCustomerLoggedIn,
+.myOrdersLoadingOrdersMessage
+  @extend .light-font
+  display: block
+  width: 80%
+  text-align: center
+  margin: 0 auto
+  color: rgb(104, 156, 224)
+  cursor: pointer
+  +trans($easybreezy)
+
+.customerOrderPage
+  display: block
+  margin: 70px auto
+  +break-for(iphone)
+    margin: 100px auto
+
+  h1
+    @extend .light-font
+    display: block
+    width: 80%
+    margin: 0 auto
+    font-weight: normal
+    +break-for(iphone)
+      width: 90%
+
+    &.myOrdersPageHeader
+      display: block
+      background: rgba(18, 18, 18, 0.04)
+      padding: 4px
+      font-style: italic
+
+.myOrderHolder
+  @extend .light-font
+  display: block
+  margin-top: 12px
+  h1
+    &.myOrdersOrderHolderHeader
+      display: block
+      background: #637ca1
+      padding: 4px
+      color: white
+
+  span
+    &.orderDetailsHolder
+      display: block
+      padding: 3px
+      width: 80%
+      margin: 0 auto
+      border: 1px dashed rgba(0, 0, 0, 0.27)
+      border-top: 0

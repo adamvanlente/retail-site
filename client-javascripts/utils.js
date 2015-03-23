@@ -11,6 +11,18 @@ retroduck.utils = {
    // Remember if mobile view has been used.
    mobileUsed: false,
 
+   // Map a color to each order status.
+   orderStatusMap: {
+    'quote': 'rgba(184, 184, 184, 1.0)',
+    'open': 'rgba(130, 153, 200, 1.0)',
+    'approved': 'rgba(102, 192, 141, 1.0)',
+    'ordered': 'rgba(195, 202, 87, 1.0)',
+    'received': 'rgba(226, 177, 101, 1.0)',
+    'printing': 'rgba(239, 116, 116, 1.0)',
+    'completed': 'rgba(54, 179, 202, 1.0)',
+    'archived': 'rgba(0, 0, 0, 0.8)'
+  },
+
    // Order in which sizes should be displayed.
    orderSizeList: ['1T', '2T', '3T', '4T', '5T', '6T', 'YXS', 'YS', 'YM', 'YL',
    'YXL', 'YXXL', 'XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', '1X',
@@ -275,7 +287,6 @@ retroduck.utils = {
       success: function(user) {
 
         // Do stuff after successful login.
-        // TODO kick off function that updates cart, if visible, and user icon
         retroduck.utils.checkForUser();
         $('.whiteOut').click();
       },
@@ -463,6 +474,18 @@ retroduck.utils = {
      if (retroduck.currentUser) {
 
        // Add logout button to menu
+       if (!$('.menuMyOrdersLink').length || $('.menuMyOrdersLink').length == 0) {
+         $('.menuLinksHolder')
+            .append($('<a>')
+              .attr('class', 'menuMyOrdersLink')
+              .attr('href', 'javascript:void(0)')
+              .html('My Orders')
+              .click(function() {
+                window.location = '/my_orders';
+              }));
+       }
+
+       // Add logout button to menu
        if (!$('.menuLogoutLink').length || $('.menuLogoutLink').length == 0) {
          $('.menuLinksHolder')
             .append($('<a>')
@@ -508,10 +531,10 @@ retroduck.utils = {
                  retroduck.utils.logUserOut();
                }));
        }
-
      } else {
        $('.userMenuIcon').hide();
        $('.menuLogoutLink').remove();
+       $('.menuMyOrdersLink').remove();
        $('.userSignInIcon')
          .show()
          .click(function() {
@@ -538,6 +561,11 @@ retroduck.utils = {
                  retroduck.utils.launchCustomerSigninForm(true);
                }));
          }
+     }
+
+     // Load user's orders.
+     if (window.location.pathname == '/my_orders') {
+       retroduck.myOrders.getCurrentUserOrders();
      }
    },
 

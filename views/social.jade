@@ -6,6 +6,10 @@ block append content
 
     div.socialDesc
       
+    if order_name
+      h1.socialOrderHeader
+        | #{order_name}
+      
     if social_items
       each val, index in social_items
         include components/product
