@@ -66,7 +66,7 @@ retroduck.myOrders = {
    *
    */
   renderSingleOrderToPage: function(order) {
-    console.log(order);
+    // console.log(order);
     // Define an id for the lement.
     var elId = 'order_' + order.objectId;
 
@@ -76,15 +76,119 @@ retroduck.myOrders = {
         .attr('class', 'myOrderHolder')
         .attr('id', elId));
 
-    // // Append a header element/
-    $('#' + elId).append($('<h1>')
-      .attr('class', 'myOrdersOrderHolderHeader')
-      .html(order.order_name));
+    // Render some details for every type of order.
+    retroduck.myOrders.renderOrderHeaderAndDetails(order, elId);
 
+    // Render items based on which type of order it is.
+    if (order.is_social_order) {
+      retroduck.myOrders.renderSocialOrderItems(order, elId);
+    }
+
+  },
+
+  /**
+   * Render items for a social order.
+   * @function that creates elements showing details about each item on a
+   *           social order.
+   * @param order Object parse order object.
+   * @param elId String id unique to the order details div.
+   *
+   */
+  renderSocialOrderItems: function(order, elId) {
+
+    // Create a holder for the order item details.
+    $('#' + elId).append($('<span>')
+      .attr('class', 'orderItemDetails')
+      .attr('id', 'orderItemDetails_' + elId));
+
+    if (JSON.parse(order.items)) {
+
+      // Create a heading for the list of designs.
+      $('#orderItemDetails_' + elId)
+        .append($('<h2>')
+          .html('Designs'))
+
+      var orderItems = JSON.parse(order.items);
+      for (var i = 0; i < orderItems.length; i++) {
+        var orderItem = orderItems[i];
+        var id = 'orderItem_' + orderItem.id;
+
+        // Append a holder for this item's details.
+        $('#orderItemDetails_' + elId)
+          .append($('<section>')
+            .attr('class', 'orderSingleItemDetails')
+            .attr('id', 'orderSingleItemDetails_' + id));
+
+        // Append the item title.
+        $('#orderSingleItemDetails_' + id)
+          .append($('<span>')
+            .attr('class', 'myOrderItemTitle')
+            .html(orderItem.item_name));
+
+        console.log(orderItem, order.is_social_order);
+
+        var isSocial = order.is_social_order;
+        if (isSocial) {
+          // add a span summarzing the social sales and totals and whatnot.
+        }
+
+
+        // Get an array of the images.
+        var imgSpan = $('<section>').attr('class', 'myOrdersImgSpan');
+        var imgArray = orderItem.design_images_list.split(',');
+        for (var j = 0; j < imgArray.length; j++) {
+          var imgUrl = imgArray[j];
+          imgSpan.append($('<img>')
+            .attr('src', imgUrl));
+        }
+        $('#orderSingleItemDetails_' + id).append(imgSpan);
+
+      }
+    } else {
+      $('#orderItemDetails_' + elId)
+        .append($('<span>')
+         .attr('class', 'noSocialOrderDesignsMessage')
+         .html('There are no items associated with this order')
+      );
+    }
+  },
+
+  /**
+   * Render main details for an order.
+   * @function that renders the order name, number and status in the
+   *           list of customer's orders.
+   * @param order Object parse order object.
+   * @param elId String id unique to the order details div.
+   *
+   */
+  renderOrderHeaderAndDetails: function(order, elId) {
+
+    // Create a holder for the order details.
     $('#' + elId).append($('<span>')
       .attr('class', 'orderDetailsHolder')
       .attr('id', 'orderDetails_' + elId));
 
+    // Get the background color for the status.
+    var orderStatusBgColor = retroduck.utils.orderStatusMap[order.order_status];
+
+    $('#orderDetails_' + elId)
+
+      // Append order name and a readable id.
+      .append($('<section>')
+        .attr('class', 'orderDetailName')
+        .append($('<h2>')
+          .html(order.order_name))
+        .append($('<h3>')
+          .html('order no. ' + order.readable_id)))
+
+      // Append the order status an a message explaining the status.
+      .append($('<section>')
+        .attr('class', 'orderDetailsStatus')
+        .append($('<label>')
+          .css({'background': orderStatusBgColor})
+          .html(order.order_status))
+        .append($('<span>')
+          .html(retroduck.msg.ORDER_STATUS_MESSAGES[order.order_status])));
   },
 
   /**

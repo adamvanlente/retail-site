@@ -20,6 +20,7 @@ retroduck.utils = {
     'received': 'rgba(226, 177, 101, 1.0)',
     'printing': 'rgba(239, 116, 116, 1.0)',
     'completed': 'rgba(54, 179, 202, 1.0)',
+    'delivered': 'rgbq(160, 115, 239, 1.0)',
     'archived': 'rgba(0, 0, 0, 0.8)'
   },
 

@@ -27,26 +27,110 @@
 
     &.myOrdersPageHeader
       display: block
-      background: rgba(18, 18, 18, 0.04)
+      background: rgba(201, 217, 239, 0.53)
       padding: 4px
       font-style: italic
+      font-size: 11px
+      color: rgba(51, 51, 51, 0.75)
 
 .myOrderHolder
   @extend .light-font
   display: block
+  border: 1px dashed rgba(0, 0, 0, 0.73)
+  padding: 3px
+  width: 80%
+  margin: 0 auto
   margin-top: 12px
+  +break-for(iphone)
+    width: 90%
   h1
     &.myOrdersOrderHolderHeader
       display: block
-      background: #637ca1
+      background: #BCBCBD
       padding: 4px
       color: white
 
   span
     &.orderDetailsHolder
       display: block
-      padding: 3px
-      width: 80%
-      margin: 0 auto
-      border: 1px dashed rgba(0, 0, 0, 0.27)
-      border-top: 0
+      margin: 4px
+
+.orderDetailName
+  @extend .light-font
+  font-size: 12px
+  background: rgba(0, 0, 0, 0.04)
+
+  h2
+    display: inline-block
+    margin: 4px
+    padding: 0
+    font-size: 18px
+    font-weight: normal
+  h3
+    display: inline-block
+    margin: 4px
+    font-size: 11px
+    background: rgba(255, 255, 255, 0.72)
+    padding: 2px 8px
+    font-weight: normal
+
+.orderDetailsStatus
+  @extend .light-font
+  display: block
+
+  label
+    display: inline-block
+    margin: 4px 0
+    padding: 4px 8px
+    width: 50px
+    text-align: center
+    text-transform: uppercase
+    color: white
+    border-radius: 1px
+  span
+    display: inline-block
+    font-size: 13px
+    color: rgba(0, 0, 0, 0.67)
+    margin: 6px
+    +break-for(iphone)
+      margin: 2px
+
+.orderItemDetails
+  display: block
+
+  h2
+    display: block
+    font-size: 14px
+    margin: 12px 0px 4px 8px
+    color: rgb(195, 187, 187)
+
+.noSocialOrderDesignsMessage
+  @extend .light-font
+  font-size: 12px
+  display: block
+  padding: 12px
+  margin: 12px
+  background: rgba(0, 0, 0, 0.01)
+  text-align: center
+  border: 1px solid rgba(0, 0, 0, 0.03)
+
+.orderSingleItemDetails
+  @extend .light-font
+  display: inline-block
+  font-size: 12px
+  padding: 12px
+  background: rgba(2, 2, 2, 0.01)
+  margin: 12px
+  border: 1px solid rgba(0, 0, 0, 0.07)
+
+.myOrderItemTitle
+  @extend .light-font
+  font-size: 16px
+  text-transform: uppercase
+
+.myOrdersImgSpan
+  img
+    display: inline-block
+    width: 100px
+    border: 4px solid rgb(208, 208, 208)
+    margin: 8px

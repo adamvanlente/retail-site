@@ -80,5 +80,19 @@ retroduck.msg = {
       'existing user, create a new account.',
   NEW_USER_CREATED: 'Your user account has been created',
 
+  // Order status messages.
+  // Map a color to each order status.
+  ORDER_STATUS_MESSAGES: {
+   'quote': 'Your order is just a quote.  Contact us to make it an official order!',
+   'open': 'Your order status is open.  This means it is active, but not yet approved for production.',
+   'approved': 'You have approved your order, and it is preparing for production.',
+   'ordered': 'We have ordered your items, and are getting ready to print them!',
+   'received': 'We have received your blank items, and are preparing to print them!',
+   'printing': 'We have your stuff, and we are printing your items right now!',
+   'completed': 'Your items are complete, and are awaiting pickup/delivery',
+   'delivered': 'Your items have been delivered/picked up.  Thanks!',
+   'archived': 'This order is archived, which means it is incomplete and inactive.'
+  },
+
 
 };
