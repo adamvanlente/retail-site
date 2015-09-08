@@ -107,6 +107,11 @@ module.exports = {
          requests.getCurrentStore(function(store) {
 
              requests.getSocialItems(orderId, function(results) {
+
+                if (!results[0] || !results[0].attributes) {
+                  return;
+                }
+
                 var order = results[0].attributes;
 
                 // Set some store params
@@ -122,8 +127,6 @@ module.exports = {
 
                   // Get the product.
                   var product = items[item];
-
-                  // console.log(product)
 
                   // Initialize price.
                   var price = getProductPrice(product);

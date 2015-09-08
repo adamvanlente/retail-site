@@ -2,14 +2,31 @@ div.menu
   span.menuLogo
     h1.homePageLink
       | RetroDuck
-    em
-      | Custom Apparel
+
+  span.menuLinks.hidden
+    nav.menuLinksHolder
+      a(href="/")
+        | Home
+      a(href="/")
+        | Catalog &amp; Pricing
+      a(href="/")
+        | Place an order
+      a(href="/")
+        | Blog
+      a(href="/about_us")
+        | About &amp; FAQ
+    label.rdLogoInMenu
+      | RetroDuck.com
+    button.closeMobileMenu
+      i.fa.fa-times
 
   span.menuCartAndUser
     span.shoppingCartMenuIcon
       i.fa.fa-shopping-cart
       nav.shoppingCartMenuIcon--count
         | 0
+      nav.shoppingCartMenuIcon--total
+        | $0.00
     span.userMenuIcon
       i.fa.fa-user
       nav.userMenuIcon--name
@@ -19,21 +36,4 @@ div.menu
         | sign in
     span.mobileMenuBars
       i.fa.fa-bars
-  
-span.menuLinks.hidden
-  nav.menuLinksHolder
-    a(href="/")
-      | Home
-    a(href="/")
-      | Catalog &amp; Pricing
-    a(href="/")
-      | Place an order
-    a(href="/")
-      | Blog
-    a(href="/about_us")
-      | About &amp; FAQ
-  label.rdLogoInMenu
-    | RetroDuck.com
-  button.closeMobileMenu
-    i.fa.fa-times
     

@@ -148,10 +148,10 @@ retroduck.cart = {
       var shipId;
 
       // Set a count word for quantity (eg 1 item/2 items).
-      var countPhrase = 'this item ';
+      var countPhrase = 'This item ';
       var extraWord = 'is '
       if (product.totalItems > 1) {
-        countPhrase = 'these items ';
+        countPhrase = 'These items ';
         extraWord = 'are ';
       }
 
@@ -190,7 +190,11 @@ retroduck.cart = {
           shipId = 'delivery';
         } else if (dm == 'shipping') {
           msg = countPhrase + 'will be shipped.  Complete the shipping '+
-              'information below';
+              'information below.';
+          shipId = 'ship';
+        } else if (dm == 'free shipping') {
+          msg = countPhrase + 'will be shipped for free.  Complete the' +
+          ' shipping information below.';
           shipId = 'ship';
         } else if (dm == 'pickup') {
           msg = countPhrase + extraWord + 'being picked up at a previously ' +
@@ -205,6 +209,7 @@ retroduck.cart = {
 
       // delivery, pickup or ship, pickup, shipping
       shoppingCartItemsDiv.append(deliverySpan);
+      retroduck.cart.shipId = shipId;
     }
 
     // Append the summary for the item to the main summary div.
@@ -368,7 +373,8 @@ retroduck.cart = {
     for (var productId in cart.items) {
       var product = cart.items[productId];
       if (product.deliveryMethod == 'pickup or ship' ||
-          product.deliveryMethod == 'shipping') {
+          product.deliveryMethod == 'shipping' ||
+          product.deliveryMethod == 'free shipping') {
             hasShippedItems = true;
           }
     }
@@ -517,6 +523,9 @@ retroduck.cart = {
     if (address.address_zip) {
       $('#cart_address_line_zip').val(address.address_zip);
     }
+
+    // Build form object.
+    retroduck.cart.buildFormObject();
   },
 
   /**
@@ -772,10 +781,24 @@ retroduck.cart = {
 
     // Append cart info to popup.
     var shipping = 0;
+    var itemsRequiringShippingFee = 0;
     if (retroduck.cart.hasItemsThatAreShipping) {
 
-      // Calculate shipping.
-      shipping = cart.totalItems > 24 ? 20.00 : 8.00;
+      // Count the number of items needing shipping fees.
+      for (item in cart.items) {
+        var prod = cart.items[item];
+        if (prod.delivery_method != 'free shipping') {
+          itemsRequiringShippingFee++;
+        }
+      }
+
+      if (itemsRequiringShippingFee > 0) {
+        shipping = 8;
+
+        if (itemsRequiringShippingFee > 24) {
+          shipping = 24;
+        }
+      }
 
       // Append shipping address.
       $('.confirmCheckoutPopupDialog')
@@ -1299,23 +1322,29 @@ retroduck.cart = {
    */
   logCartKeystrokes: function() {
     $(document).keyup(function(e) {
-
-        retroduck.cart.formObject = {
-          'credit_card_number': $('#credit_card_number').val(),
-          'credit_card_cvc': $('#credit_card_cvc').val(),
-          'credit_card_zip': $('#credit_card_zip').val(),
-          'credit_card_month': $('#credit_card_month').val(),
-          'credit_card_year': $('#credit_card_year').val(),
-
-          'cart_address_line_one': $('#cart_address_line_one').val(),
-          'cart_address_line_two': $('#cart_address_line_two').val(),
-          'cart_address_line_city': $('#cart_address_line_city').val(),
-          'cart_address_line_state': $('#cart_address_line_state').val(),
-          'cart_address_line_zip': $('#cart_address_line_zip').val()
-        };
+      retroduck.cart.buildFormObject();
     });
   },
 
+  /**
+   * Build an object based on the values in the shopping cart form.
+   *
+   */
+  buildFormObject: function() {
+    retroduck.cart.formObject = {
+      'credit_card_number': $('#credit_card_number').val(),
+      'credit_card_cvc': $('#credit_card_cvc').val(),
+      'credit_card_zip': $('#credit_card_zip').val(),
+      'credit_card_month': $('#credit_card_month').val(),
+      'credit_card_year': $('#credit_card_year').val(),
+
+      'cart_address_line_one': $('#cart_address_line_one').val(),
+      'cart_address_line_two': $('#cart_address_line_two').val(),
+      'cart_address_line_city': $('#cart_address_line_city').val(),
+      'cart_address_line_state': $('#cart_address_line_state').val(),
+      'cart_address_line_zip': $('#cart_address_line_zip').val()
+    };
+  },
 
   /**
    * Prepare database order object and commit payment.
@@ -1325,12 +1354,40 @@ retroduck.cart = {
    *
    */
   assembleAndPayForOrder: function() {
+    var form = retroduck.cart.formObject;
+    var msg = '';
 
+    if (!form) {
+      msg = 'Please complete the form to complete check out.';
+      retroduck.utils.errorMessage(msg);
+      return;
+    }
+
+    var requiredItems = {
+      'credit_card_number': 'Credit Card number',
+      'credit_card_cvc': 'Credit Card Security code',
+      'credit_card_zip': 'Credit Card Billing Zip Code',
+      'credit_card_month': 'Credit Card Exp Month',
+      'credit_card_year': 'Credit Card Exp Year',
+      'cart_address_line_one': 'Address Street',
+      'cart_address_line_city': 'Address City',
+      'cart_address_line_state': 'Address State',
+      'cart_address_line_zip': 'Address Zip Code'
+    };
+
+    for (var field in form) {
+      if (!form[field] && requiredItems[field]) {
+        msg += requiredItems[field] + ' is required<br>';
+      }
+      var formIsInvalid = true;
+    }
+
+    if (formIsInvalid) {
+      retroduck.utils.errorMessage(msg);
+      return;
+    }
     var total = retroduck.cart.grandTotal;
-    var isShipping = retroduck.cart.hasItemsThatAreShipping;
-    console.log(total, isShipping)
-    console.log('checking out')
-
+    console.log(total, formObject);
   },
 
   /** Show a message that the cart is empty. **/
@@ -1338,7 +1395,13 @@ retroduck.cart = {
     $('.shoppingCartDialog')
       .append($('<span>')
         .attr('class', 'noShoppingCartItems')
-        .html('Your shopping cart is empty.  Add some stuff!'));
+        .html('Your shopping cart is empty.  Add some stuff!'))
+      .append($('<button>')
+        .html('OK!  I Will!')
+        .attr('class', 'noShoppingCartItemsButton')
+        .click(function() {
+          $('.shoppingCartDialog').hide();
+        }));
   },
 
   /** Update the shopping cart icon. **/
@@ -1350,15 +1413,20 @@ retroduck.cart = {
 
     // Set cart total.
     var cartTotal = 0;
+    var cartSubtotal = 0;
 
     // Iterate over all items.
     for (var item in cart.items) {
-      cartTotal += parseInt(cart.items[item].totalItems);
+      var prod = cart.items[item];
+      cartTotal += parseInt(prod.totalItems);
+      cartSubtotal += (prod.totalItems * prod.price);
     }
 
     // Set the cart icon.
     $('.shoppingCartMenuIcon--count')
       .html(cartTotal);
+    $('.shoppingCartMenuIcon--total')
+      .html('$' + Number(cartSubtotal).toFixed(2));
   },
 
   /** Show the user their shopping cart. **/

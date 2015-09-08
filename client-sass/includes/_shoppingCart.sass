@@ -81,8 +81,8 @@
                 text-align: center
                 +break-for(iphone)
                   font-size: 16px
-                  padding: 8px 16px
-                  margin: 0 12px
+                  padding: 8px 12px
+                  margin: 2px
                   text-align: center
                   +trans($easybreezy)
                 &.toggleSizesUp
@@ -140,14 +140,14 @@
       width: 100%
       padding: 8px
       margin: 8px 0
-      background: rgb(85, 174, 120)
+      background: $go-green
       color: white
     &.cartContinueButton
       display: block
       width: 100%
       padding: 4px
       margin: 8px 0
-      background: #D87E7E
+      background: $cancel-red
       color: white
     &:hover
       background: #333
@@ -159,7 +159,6 @@
   text-align: center
   +break-for(iphone)
     width: 100%
-    margin: 100px auto
 
   h1
     @extend .light-font
@@ -198,7 +197,7 @@
       display: block
       width: 50%
       padding: 12px
-      background: #f77777
+      background: $cancel-red
       color: white
       margin: 24px auto
       font-size: 16px
@@ -461,6 +460,7 @@
     left: 10px
     right: 10px
     bottom: 10px
+    max-height: 5000px
 
   h3
     @extend .light-font
@@ -565,3 +565,12 @@
 
 .logoutLinkWithinCart
   margin-top: 12px
+
+.noShoppingCartItemsButton
+  width: 100%
+  margin-top: 25%
+  padding: 10px
+  background-color: #40B159
+  color: white
+  border-radius: 2px
+  cursor: pointer

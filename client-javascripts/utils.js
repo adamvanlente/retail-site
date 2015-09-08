@@ -158,6 +158,8 @@ retroduck.utils = {
    setUserResetPasswordButtons: function() {
      $('.repeatPass').hide();
      $('.userPass').hide();
+     $('#first_name').hide();
+     $('#last_name').hide();
      $('.customerSigninFormButtons')
        .html('')
        .append($('<button>')

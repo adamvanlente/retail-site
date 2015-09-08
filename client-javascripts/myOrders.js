@@ -66,7 +66,7 @@ retroduck.myOrders = {
    *
    */
   renderSingleOrderToPage: function(order) {
-    // console.log(order);
+
     // Define an id for the lement.
     var elId = 'order_' + order.objectId;
 
@@ -247,6 +247,6 @@ retroduck.myOrders = {
        .html('')
        .append($('<span>')
          .attr('class', 'myOrdersNoOrdersFoundMessage')
-         .html('I couldn\'t find an orders associated with your account.'));
+         .html('I couldn\'t find any orders associated with your account.'));
    }
 };

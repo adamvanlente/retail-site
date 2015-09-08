@@ -12,11 +12,11 @@
       @extend .serif-title-font
       display: inline-block
       font-size: 32px
-      padding: 24px 32px
-      color: #333333
+      padding: 16px 32px
+      color: #FAFAFA
       vertical-align: top
       position: fixed
-      background: #fafafa
+      background: #333333
       left: 0
       right: 0
       z-index: 1
@@ -37,7 +37,6 @@
           opacity: 0.8
 
       &.scrolled
-        background: rgba(250, 250, 250, 0.98)
         box-shadow: 0 0 10px rgba(0,0,0,0.05)
 
       em
@@ -56,7 +55,7 @@
         display: inline-block
 
       i
-        color: #333333
+        color: #FAFAFA
         font-size: 32px
         margin: -2px 4px
 
@@ -71,6 +70,15 @@
         right: 8px
 
       .shoppingCartMenuIcon--count
+        background-color: rgba(0, 0, 0, 0.17)
+        width: 20px
+        height: 20px
+        text-align: center
+        border-radius: 20px
+        box-shadow: 0 0.5px 1px rgba(0,0,0,0.5)
+
+      .shoppingCartMenuIcon--count,
+      .shoppingCartMenuIcon--total
         @extend .light-font
         display: inline-block
         font-style: normal
@@ -83,24 +91,27 @@
         margin: 0 4px 0 12px
         +break-for(iphone)
           padding: 0 8px
+          display: none !important
 
         &:hover
           label
             display: block
 
         i
-          color: #BEBEA2
+          color: #FAFAFA
           font-size: 16px
+
+          +break-for(iphone)
+            display: none
 
         .userMenuIcon--name
           display: inline-block
           font-style: normal
-          color: rgba(51, 51, 51, 0.65)
+          color: #FAFAFA
           font-size: 11px
           padding: 0 4px
-          line-height: 14px
-          max-width: 120px
-          overflow: hidden
+          line-height: 9px
+          max-width: 140px
           text-overflow: ellipsis
 
           +break-for(iphone)
@@ -117,10 +128,10 @@
           padding: 2px 1px
           font-size: 12px
           +break-for(iphone)
-            margin: 4px 8px
+            display: none !important
 
           i
-            color: rgba(51, 51, 51, 0.16)
+            color: #FAFAFA
             font-size: 16px
             margin-right: 8px
 
@@ -128,23 +139,25 @@
           @extend .light-font
           display: inline-block
           font-style: normal
-          color: rgba(51, 51, 51, 0.42)
+          color: #FAFAFA
           font-size: 12px
 
 .shoppingCartMenuIcon
   @extend .light-font
   display: inline-block
   font-size: 18px
-  color: #637CA1
-  padding: 4px
+  padding: 4px 12px
+  background-color: $cancel-red
+  box-shadow: 0 2px 1px rgba(0,0,0,0.2)
+  border-radius: 3px
+  color: #FAFAFA
   +trans($easybreezy)
   +break-for(iphone)
-    padding: 0
+    margin-top: -6px
+    margin-right: 8px
   &:hover
     cursor: pointer
     opacity: 0.9
-    background: rgba(0,0,0,0.03)
-
 
 .closeMobileMenu
   @extend .basic-button
@@ -165,7 +178,7 @@
   @extend .light-font
   display: block
   position: fixed
-  right: 20px
+  right: 300px
   z-index: 5
   +trans($easyslider)
 
@@ -181,7 +194,7 @@
       top: 0
 
   &.hidden
-    top: 64px
+    top: 30px
 
     +break-for(iphone)
       top: -1000px
@@ -203,7 +216,7 @@
     display: inline-block
     padding: 4px 12px
     text-decoration: none
-    color: #333
+    color: #FAFAFA
     font-size: 12px
     +trans($easybreezy)
 
@@ -214,7 +227,7 @@
       color: rgb(63, 113, 190)
 
     &:hover
-      color: rgba(51, 51, 51, 0.65)
+      opacity: 0.9
       text-decoration: underline
 
     +break-for(iphone)
