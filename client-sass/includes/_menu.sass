@@ -221,10 +221,13 @@
     +trans($easybreezy)
 
     &.menuLogoutLink
-      color: $cancel-red
+      background-color: $cancel-red
+      text-align: center
+      margin-top: 7px
 
     &.menuMyOrdersLink
-      color: rgb(63, 113, 190)
+      background-color: #3f71be
+      text-align: center
 
     &:hover
       opacity: 0.9
@@ -233,7 +236,14 @@
     +break-for(iphone)
       display: block
       font-size: 16px
-      padding: 24px
+      padding: 16px
       color: #fff
       &:hover
         color: #DCDCDC
+
+.menuMobileSignInLink
+  display: none
+  +break-for(iphone)
+    display: block
+    background-color: $go-green
+    text-align: center

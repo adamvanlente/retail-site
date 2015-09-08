@@ -470,11 +470,26 @@ retroduck.utils = {
    /** Check if a user is present **/
    checkForUser: function() {
 
-     // Define user
+     // Define user.
      retroduck.currentUser = Parse.User.current();
+
+     if (!retroduck.currentUser) {
+
+       // Add sign in button to menu
+       $('.menuLinksHolder')
+          .append($('<a>')
+            .attr('class', 'menuMobileSignInLink')
+            .attr('href', 'javascript:void(0)')
+            .html('Sign In')
+            .click(function() {
+              retroduck.utils.launchCustomerSigninForm();
+            }));
+     }
 
      // Condition if a customer is found.
      if (retroduck.currentUser) {
+
+       $('.menuMobileSignInLink').hide();
 
        // Add logout button to menu
        if (!$('.menuMyOrdersLink').length || $('.menuMyOrdersLink').length == 0) {
