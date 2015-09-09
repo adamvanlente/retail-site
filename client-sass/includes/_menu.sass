@@ -6,6 +6,8 @@
   right: 0
   white-space: nowrap
   z-index: 1
+  +break-for(iphone)
+    z-index: 11
 
   span
     &.menuLogo
@@ -211,13 +213,17 @@
     +trans($easybreezy)
 
     &.menuLogoutLink
-      background-color: $cancel-red
-      text-align: center
-      margin-top: 7px
+      color: $cancel-red
+      +break-for(iphone)
+        background-color: $cancel-red
+        text-align: center
+        margin-top: 7px
 
     &.menuMyOrdersLink
-      background-color: #3f71be
-      text-align: center
+      color: #3f71be
+      +break-for(iphone)
+        background-color: #3f71be
+        text-align: center
 
     +break-for(iphone)
       display: block

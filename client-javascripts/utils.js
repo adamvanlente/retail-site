@@ -475,6 +475,8 @@ retroduck.utils = {
 
      if (!retroduck.currentUser) {
 
+       $('.menuMobileSignInLink').remove();
+
        // Add sign in button to menu
        $('.menuLinksHolder')
           .append($('<a>')
@@ -483,6 +485,11 @@ retroduck.utils = {
             .html('Sign In')
             .click(function() {
               retroduck.utils.launchCustomerSigninForm();
+              $('.menuLinks').attr('class', 'menuLinks hidden');
+              $('.closeMobileMenu').hide();
+              setTimeout(function() {
+                $('.menuCartAndUser').show();
+              }, 300);
             }));
      }
 

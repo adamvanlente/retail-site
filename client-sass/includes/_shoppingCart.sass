@@ -9,34 +9,40 @@
   position: fixed
   background: white
   z-index: 11
-  padding: 12px
   top: 50px
   left: 30%
   right: 30%
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1)
+  background-color: $cancel-red
+  border-radius: 3px
+  box-shadow: 0 2px 3px rgba(0,0,0,0.4)
+
   +break-for(iphone)
     left: 10px
     right: 10px
-    bottom: 10px
-    top: 10px
-    border: 1px solid #DCDCDC
+    top: 25px
 
   h1
-    font-size: 16px
+    font-size: 20px
     font-weight: normal
     text-align: center
-    color: #333
+    color: #FAFAFA
     margin: 0 0 12px 0
+    background-color: rgba(255, 255, 255, 0.07)
+    padding: 12px
+    border-top-left-radius: 2px
+    border-top-right-radius: 2px
+    border-bottom: 3px solid rgba(255, 255, 255, 0.1)
+
 
   span
     display: block
 
     &.productSpanWithinCartPopup
       font-size: 13px
-      background: rgba(241, 241, 241, 0.49)
       padding: 2px 8px
       max-height: 250px
       overflow: scroll
+      border-bottom: 4px solid #333
 
       h2
         font-size: 16px
@@ -45,7 +51,7 @@
 
       img
         display: inline-block
-        width: 30px
+        width: 50px
         margin: 4px
         border: 1px solid rgba(0, 0, 0, 0.53)
         box-shadow: 0 1px 1px rgba(0,0,0,0.1)
@@ -63,7 +69,7 @@
           label
             &.sizeLabelWithinSizeSpan,
             &.quantityLabelWithinSizeSpan
-              padding: 12px
+              padding: 12px 4px
               vertical-align: top
               display: inline-block
               width: 25px
@@ -73,33 +79,35 @@
                 font-size: 16px
             &.toggleSizeLabel
               button
-                padding: 4px 12px
-                vertical-align: top
-                display: inline-block
-                margin: 6px 0
-                font-size: 13px
+                font-size: 16px
+                padding: 8px 12px
+                margin: 8px 2px
                 text-align: center
+                border-radius: 3px
+                box-shadow: 0 1px 1px rgba(0,0,0,0.2)
+                vertical-align: top
+
                 +break-for(iphone)
                   font-size: 16px
                   padding: 8px 12px
-                  margin: 2px
+                  margin: 6px
                   text-align: center
                   +trans($easybreezy)
                 &.toggleSizesUp
                   display: inline-block
-                  color: white
-                  background: #4C4C4C
+                  color: #333
+                  background: #FAFAFA
                 &.toggleSizesDown
                   display: inline-block
-                  color: white
-                  background: #A9A9A9
+                  color: #FAFAFA
+                  background: #333
 
     &.noShoppingCartItems
       display: block
-      color: #B29898
+      color: white
       padding: 4px
       text-align: center
-      border: 1px solid
+      border: none
 
     &.shoppingCartItem
       display: block
@@ -125,9 +133,10 @@
 
     &.shoppingCartSummary
       display: block
-      text-align: center
-      background: #F1F1F1
+      text-align: left
       margin-top: 12px
+      color: #FAFAFA
+      font-size: 16px
 
       label
         display: inline-block
@@ -137,11 +146,14 @@
     @extend .basic-button
     &.cartCheckoutButton
       display: block
-      width: 100%
+      width: 90%
       padding: 8px
-      margin: 8px 0
-      background: $go-green
-      color: white
+      margin: 16px auto
+      background: #FAFAFA
+      color: #333
+      text-transform: uppercase
+      border-radius: 2px
+      box-shadow: 0 2px 1px rgba(255,255,255,0.2)
     &.cartContinueButton
       display: block
       width: 100%
@@ -149,6 +161,7 @@
       margin: 8px 0
       background: $cancel-red
       color: white
+      font-size: 18px
 
 .shoppingCartPage
   display: block
@@ -156,46 +169,41 @@
   margin: 70px auto
   text-align: center
   +break-for(iphone)
-    width: 100%
+    width: 98%
 
   h1
     @extend .light-font
     display: block
     margin: 0
-    padding: 4px
+    padding: 8px
     font-size: 13px
-
-    &.orderSummaryTitle
-      background: $go-green
-      color: rgba(255, 255, 255, 0.56)
-      margin-top: 12px
-
-    &.creditCardFormTitle
-      margin-top: 12px
-      background: rgb(84, 130, 192)
-      color: rgba(255, 255, 255, 0.6)
-
-    &.customerDetailsFormTitle
-      margin-top: 12px
-      background: #CDCDCD
-      color: #333
-
-    &.shippingAddressFormHeader
-      margin-top: 12px
-      background: #B3C547
-      color: rgba(255, 255, 255, 0.6)
+    margin-top: 12px
+    background: rgba(231, 76, 60, 0.83)
+    border-bottom: 3px solid rgba(255, 255, 255, 0.3)
+    color: white
+    border-top-left-radius: 3px
+    border-top-right-radius: 3px
 
     i
       display: inline-block
       margin-left: 8px
 
   button
+
+    span
+      display: block
+      background-color: rgba(255, 255, 255, 0.26)
+      padding: 2px
+      font-size: 12px
+      margin: 4px 12px
+
     @extend .basic-button
     &.confirmShoppingCartDetailsButton
       display: block
       width: 50%
       padding: 12px
-      background: $cancel-red
+      background-color: $go-green
+      box-shadow: 0 2px 2px rgba(0,0,0,0.2)
       color: white
       margin: 24px auto
       font-size: 16px
@@ -209,9 +217,10 @@
 
 .shoppingCartItemsDiv
   display: block
-  border: 1px solid $go-green
   border-bottom: none
   padding: 12px 0
+  background-color: $cancel-red
+  color: white
 
   span
     &.deliverySpan
@@ -220,9 +229,11 @@
         display: block
         font-size: 11px
         text-align: left
-        padding: 2px 8px
-        background: #e4e4e4
-        margin: 4px 24px 12px 22px
+        background: rgba(255, 255, 255, 0.17)
+        margin: 6px 24px 12px 22px
+        font-style: normal
+        padding: 4px
+        border-radius: 1px
       input
         display: inline-block
         margin-left: 12px
@@ -282,7 +293,7 @@
     &.costDisclaimer
       display: block
       font-size: 10px
-      background: gray
+      background: $cancel-red
       color: white
       padding: 2px
 
@@ -295,12 +306,11 @@
         text-align: center
         padding: 6px 0px
         color: white
-        &.costPrice
-          background: #7BC590
-          width: 43%
+        border-top: 1px solid rgba(255, 255, 255, 0.16)
+        &.costPrice,
         &.costTitle
-          background: $go-green
-          width: 43%
+          background: $cancel-red
+          width: 50%
         &.editCart
           background: #FFFFFF
           width: 15%
@@ -363,28 +373,29 @@
 .customerFormDiv
   @extend .light-font
   display: block
-  padding: 4px
-  border: 1px solid #CDCDCD
+  background-color: $cancel-red
+  color: white
   padding: 12px
 
   button
     @extend .basic-button
     display: block
-    background: rgb(145, 144, 145)
-    color: white
+    background: #FAFAFA
+    color: #333
+    border-radius: 1px
     margin: 0 auto
     margin-bottom: 12px
     padding: 8px 16px
 
   label
     display: block
-    color: rgb(49, 114, 153)
+    color: #FAFAFA
     font-size: 12px
 
 .creditCardFormDiv
   display: block
   padding: 4px
-  border: 1px solid #5482c0
+  border: 1px solid $cancel-red
   padding-bottom: 12px
 
   input
@@ -413,7 +424,7 @@
   display: block
   padding: 4px
   padding-bottom: 12px
-  border: 1px solid #B3C547
+  border: 1px solid $cancel-red
 
   input
     @extend .basic-input
@@ -467,9 +478,10 @@
 
     header
       display: block
-      color: rgba(195, 187, 187, 0.8)
       font-size: 12px
-      background: rgba(0, 0, 0, 0.02)
+      background: rgba(0, 0, 0, 0.11)
+      padding: 2px
+      color: #333
 
     &.confirmCartButtons
       @extend .light-font
@@ -545,12 +557,14 @@
 .cartLoggedInCustomerInfo
   display: block
   font-size: 12px
-  color: #333
+  color: white
 
   em
     display: inline-block
     font-style: normal
-    color: $go-green
+    color: white
+    background-color: rgba(255, 255, 255, 0.21)
+    padding: 2px 4px
 
 .logoutLinkWithinCart
   margin-top: 12px

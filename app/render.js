@@ -113,6 +113,7 @@ module.exports = {
                 }
 
                 var order = results[0].attributes;
+                var orderId = results[0].id;
 
                 // Set some store params
                 store.order_name = order.order_name
@@ -154,6 +155,7 @@ module.exports = {
 
                 // Add social items to store object.
                 store.social_items = socialItems;
+                store.order_id = orderId;
 
                 // Render the homepage.
                 res.render('social.jade', store);

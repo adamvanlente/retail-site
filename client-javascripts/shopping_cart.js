@@ -51,9 +51,6 @@ retroduck.cart = {
     // Show a summary of the cart items and quantities.
     var cost = retroduck.cart.showItemSummary(cart, shoppingCartDiv);
 
-    // Show a summary of costs.
-    retroduck.cart.showCostSummary(cost, shoppingCartDiv);
-
     // Create and show billing options.
     retroduck.cart.showCreditCardForm(shoppingCartDiv);
 
@@ -61,7 +58,7 @@ retroduck.cart = {
     retroduck.cart.showShippingAddressForm(shoppingCartDiv, cart);
 
     // Add a button that lets the user confirm their payment/shipping details.
-    retroduck.cart.addConfirmCartButton(shoppingCartDiv)
+    retroduck.cart.addConfirmCartButton(shoppingCartDiv, cost)
 
     if (retroduck.cart.formObject) {
       for (var field in retroduck.cart.formObject) {
@@ -273,13 +270,7 @@ retroduck.cart = {
           .html('total cost'))
         .append($('<label>')
           .attr('class', 'costPrice')
-          .html('$' + parseFloat(cost).toFixed(2) + '*'))
-        .append($('<label>')
-          .html('edit <i class="fa fa-pencil"></i>')
-          .attr('class', 'editCart')
-          .click(function() {
-            retroduck.cart.show();
-          })))
+          .html('$' + parseFloat(cost).toFixed(2) + '*')))
 
       .append($('<span>')
         .attr('class', 'costDisclaimer')
@@ -308,28 +299,33 @@ retroduck.cart = {
 
       .append($('<input>')
         .attr('class', 'creditCardFormNumber')
+        .val('4111111111111111')
         .attr('id', 'credit_card_number')
         .attr('type', 'text')
         .attr('placeholder', retroduck.msg.CREDIT_CARD_NUMBER))
 
       .append($('<input>')
         .attr('class', 'creditCardFormMonth')
+        .val('02')
         .attr('id', 'credit_card_month')
         .attr('type', 'text')
         .attr('placeholder', retroduck.msg.CREDIT_CARD_MONTH))
 
       .append($('<input>')
         .attr('class', 'creditCardFormYear')
+        .val('18')
         .attr('id', 'credit_card_year')
         .attr('placeholder', retroduck.msg.CREDIT_CARD_YEAR))
 
       .append($('<input>')
         .attr('class', 'creditCardFormCVC')
+        .val('333')
         .attr('id', 'credit_card_cvc')
         .attr('placeholder', retroduck.msg.CREDIT_CARD_CVC))
 
       .append($('<input>')
         .attr('class', 'creditCardFormZip')
+        .val('10023')
         .attr('id', 'credit_card_zip')
         .attr('placeholder', retroduck.msg.CREDIT_CARD_ZIP));
 
@@ -557,12 +553,16 @@ retroduck.cart = {
    * @param shoppingCartDiv Object dom element for shopping cart div
    *
    */
-  addConfirmCartButton: function(shoppingCartDiv) {
+  addConfirmCartButton: function(shoppingCartDiv, cost) {
+
+    var costString = '$' + Number(cost).toFixed(2) + ' plus shipping & tax';
 
     // Add a button that lets the user confirm their card/shipping info.
     // Set a header for the summary.
     shoppingCartDiv.append($('<button>')
       .html(retroduck.msg.CONFIRM_CART_BUTTON)
+      .append($('<span>')
+        .html(costString))
       .attr('class', 'confirmShoppingCartDetailsButton')
       .click(function() {
         retroduck.cart.launchCartConfirmation();
@@ -578,10 +578,45 @@ retroduck.cart = {
    */
   launchCartConfirmation: function() {
 
-    // First, check for a user.
-    if (!retroduck.currentUser) {
-      var msg = retroduck.msg.NO_USER_LOGGED_IN;
+    // Validate the form first.
+    var form = retroduck.cart.formObject;
+    var msg = '';
+    var formIsInvalid = false;
+
+    if (!form) {
+      msg = 'Please complete the form to complete check out.';
       retroduck.utils.errorMessage(msg);
+      return;
+    }
+
+    var requiredItems = {
+      'credit_card_number': 'Credit Card number',
+      'credit_card_cvc': 'Credit Card Security code',
+      'credit_card_zip': 'Credit Card Billing Zip Code',
+      'credit_card_month': 'Credit Card Exp Month',
+      'credit_card_year': 'Credit Card Exp Year',
+      'cart_address_line_one': 'Address Street',
+      'cart_address_line_city': 'Address City',
+      'cart_address_line_state': 'Address State',
+      'cart_address_line_zip': 'Address Zip Code'
+    };
+
+    for (var field in form) {
+      if (!form[field] && requiredItems[field]) {
+        msg += requiredItems[field] + ' is required<br>';
+        formIsInvalid = true;
+      }
+    }
+
+    if (formIsInvalid) {
+      retroduck.utils.errorMessage(msg);
+      return;
+    }
+
+    // Check for a user.
+    if (!retroduck.currentUser) {
+      var usrMsg = retroduck.msg.NO_USER_LOGGED_IN;
+      retroduck.utils.errorMessage(usrMsg);
       return;
     }
 
@@ -1162,6 +1197,7 @@ retroduck.cart = {
     var thumb = button.name;
     var price = button.title.split('_')[0];
     var name = button.title.split('_')[1];
+    var orderId = $('.hiddenOrderId').html();
 
     // Check for a shopping cart in the properties.
     var cart = retroduck.utils.getOneCookie('cart');
@@ -1183,6 +1219,10 @@ retroduck.cart = {
     // Set a property for this product in the items list.
     if (!cart.items[productId]) {
       cart.items[productId] = {};
+    }
+
+    if (!cart.items[productId].order_id) {
+      cart.items[productId].order_id = orderId;
     }
 
     // Set a thumbnail for the product.
@@ -1354,40 +1394,12 @@ retroduck.cart = {
    *
    */
   assembleAndPayForOrder: function() {
-    var form = retroduck.cart.formObject;
-    var msg = '';
-
-    if (!form) {
-      msg = 'Please complete the form to complete check out.';
-      retroduck.utils.errorMessage(msg);
-      return;
-    }
-
-    var requiredItems = {
-      'credit_card_number': 'Credit Card number',
-      'credit_card_cvc': 'Credit Card Security code',
-      'credit_card_zip': 'Credit Card Billing Zip Code',
-      'credit_card_month': 'Credit Card Exp Month',
-      'credit_card_year': 'Credit Card Exp Year',
-      'cart_address_line_one': 'Address Street',
-      'cart_address_line_city': 'Address City',
-      'cart_address_line_state': 'Address State',
-      'cart_address_line_zip': 'Address Zip Code'
-    };
-
-    for (var field in form) {
-      if (!form[field] && requiredItems[field]) {
-        msg += requiredItems[field] + ' is required<br>';
-      }
-      var formIsInvalid = true;
-    }
-
-    if (formIsInvalid) {
-      retroduck.utils.errorMessage(msg);
-      return;
-    }
+    var cart = retroduck.utils.getOneCookie('cart');
+    cart = JSON.parse(cart);
     var total = retroduck.cart.grandTotal;
-    console.log(total, formObject);
+    var form = retroduck.cart.formObject;
+    console.log(total, form);
+    console.log(cart);
   },
 
   /** Show a message that the cart is empty. **/
@@ -1401,6 +1413,7 @@ retroduck.cart = {
         .attr('class', 'noShoppingCartItemsButton')
         .click(function() {
           $('.shoppingCartDialog').hide();
+          $('.whiteOut').hide();
         }));
   },
 
