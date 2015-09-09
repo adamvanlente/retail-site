@@ -33,9 +33,6 @@
         +trans($easybreezy)
         +break-for(iphone)
           font-size: 24px
-        &:hover
-          opacity: 0.8
-
       &.scrolled
         box-shadow: 0 0 10px rgba(0,0,0,0.05)
 
@@ -92,10 +89,6 @@
         +break-for(iphone)
           padding: 0 8px
           display: none !important
-
-        &:hover
-          label
-            display: block
 
         i
           color: #FAFAFA
@@ -155,9 +148,6 @@
   +break-for(iphone)
     margin-top: -6px
     margin-right: 8px
-  &:hover
-    cursor: pointer
-    opacity: 0.9
 
 .closeMobileMenu
   @extend .basic-button
@@ -229,17 +219,11 @@
       background-color: #3f71be
       text-align: center
 
-    &:hover
-      opacity: 0.9
-      text-decoration: underline
-
     +break-for(iphone)
       display: block
       font-size: 16px
       padding: 16px
       color: #fff
-      &:hover
-        color: #DCDCDC
 
 .menuMobileSignInLink
   display: none
