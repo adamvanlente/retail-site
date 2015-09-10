@@ -1400,6 +1400,16 @@ retroduck.cart = {
     var form = retroduck.cart.formObject;
     console.log(total, form);
     console.log(cart);
+
+    // assemble the order and create object
+    // charge card
+    // store order if successful, deliver message if not
+    // if order_id, apply items & payments to that order.
+    // if custom order, apply payment to that order.
+    // clear cart.
+    // deliver user to confirmation page with their order conf #
+    // Payments will have a conf #
+
   },
 
   /** Show a message that the cart is empty. **/
