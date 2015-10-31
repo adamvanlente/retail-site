@@ -27,6 +27,10 @@ retroduck.msg = {
   // Cart confirmation screen.
   CART_CONFIRM_BUY: 'Ok buy the stuff',
   CART_CANCEL_BUY: 'cancel',
+  CONFIRM_CARD_MESSAGE: 'Placing order.  One moment!',
+
+  // Order success.
+  ORDER_SUCCESS_HEADER: 'You did it!',
 
   // Shopping cart title for order summary section.
   ORDER_SUMMARY_TITLE: 'Order summary <i class="fa fa-list"></i>',

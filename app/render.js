@@ -38,6 +38,27 @@ module.exports = {
     },
 
     /**
+     * Render search results.
+     * @function that performs and renders search results.
+     *
+     */
+    performSearch: function(res, term) {
+
+      var DbCatalogItem = Parse.Object.extend('dbCatalogItem');
+      var query = new Parse.Query(DbCatalogItem);
+
+      query.matches('parse_search_string', term.toLowerCase());
+      query.find({
+        success: function(items) {
+          res.json(items);
+        },
+        error: function(err) {
+          console.log('error with search', err);
+        }
+      })
+    },
+
+    /**
     * Render the user's orders.
     * @function that renders customer order page.
     *

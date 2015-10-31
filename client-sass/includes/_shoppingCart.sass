@@ -451,25 +451,25 @@
   right: 35%
   max-height: 350px
   overflow: scroll
-  background: rgb(247, 247, 247)
-  padding: 12px
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1)
+  background: $cancel-red
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2)
   z-index: 20
-  border: 1px dashed rgba(0, 0, 0, 0.16)
+  border-radius: 2px
+
   +break-for(iphone)
     border: 1px solid rgba(0, 0, 0, 0.32)
     top: 10px
     left: 10px
     right: 10px
-    bottom: 10px
-    max-height: 5000px
 
   h3
     @extend .light-font
     display: block
     text-align: center
     margin: 0
-    padding: 2px
+    background-color: rgba(255, 255, 255, 0.14)
+    color: #FAFAFA
+    padding: 8px
 
   section
     @extend .light-font
@@ -479,9 +479,10 @@
     header
       display: block
       font-size: 12px
-      background: rgba(0, 0, 0, 0.11)
       padding: 2px
-      color: #333
+      text-decoration: underline
+      text-transform: uppercase
+      color: rgba(255, 255, 255, 0.45)
 
     &.confirmCartButtons
       @extend .light-font
@@ -491,24 +492,31 @@
 
         &.cartPayButton
           display: inline-block
-          background: rgb(72, 138, 226)
+          background: white
           margin-right: 12px
-          color: white
+          color: $cancel-red
+          margin: 0px
+          margin-bottom: 4px
           font-size: 13px
           padding: 8px 16px
           border-radius: 1px
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+          box-shadow: 0 2px 4px
           +trans($easybreezy)
+
+          &:disabled
+            opacity: 0.2
+            pointer-events: none
 
         &.cartCancelButton
           display: inline-block
           background: none
           font-size: 12px
-          color: $cancel-red
-
+          color: white
+          float: right
+          margin: 8px 12px
+          text-transform: uppercase
 
     &.confirmCartCosts
-
       span
         display: block
 
@@ -519,9 +527,10 @@
           em
             font-style: normal
             display: inline-block
-            color: #333333
-            font-size: 13px
+            color: white
+            font-size: 11px
             width: 70px
+            margin-left: 2px
 
         &.standard
 
@@ -529,9 +538,10 @@
           em
             font-style: normal
             display: inline-block
-            color: #7C7373
+            color: white
             font-size: 11px
             width: 70px
+            margin-left: 2px
 
 
     &.confirmCardDetails
@@ -545,6 +555,8 @@
       label
         display: block
         font-size: 12px
+        color: white
+        margin-left: 2px
 
 .noShippingOptions
   @extend .light-font
@@ -577,3 +589,21 @@
   color: white
   border-radius: 2px
   cursor: pointer
+
+
+.confirmOrderWrapper
+
+  h1
+    display: block
+    background: none
+    border: none
+    color: #333
+    font-family: "Playfair Bold", serif
+    font-size: 32px
+    margin-bottom: 16px
+
+  .orderSuccessAmountMessage,
+  .orderSuccessConfNumber
+    @extend .light-font
+    display: block
+    font-size: 13px

@@ -365,13 +365,13 @@ retroduck.cart = {
   showShippingAddressForm: function(shoppingCartDiv, cart) {
 
     // Determine what to do based on different shipping methods.
-    var hasShippedItems;
+    retroduck.cart.hasShippedItems = false;
     for (var productId in cart.items) {
       var product = cart.items[productId];
       if (product.deliveryMethod == 'pickup or ship' ||
           product.deliveryMethod == 'shipping' ||
           product.deliveryMethod == 'free shipping') {
-            hasShippedItems = true;
+            retroduck.cart.hasShippedItems = true;
           }
     }
 
@@ -387,7 +387,7 @@ retroduck.cart = {
     shoppingCartDiv.append(shippingDetailsDiv);
 
     // Do not include shipping options if no items are eligible.
-    if (!hasShippedItems) {
+    if (!retroduck.cart.hasShippedItems) {
       retroduck.cart.setShippingFormEmpty(shippingDetailsDiv);
     } else {
 
@@ -594,12 +594,15 @@ retroduck.cart = {
       'credit_card_cvc': 'Credit Card Security code',
       'credit_card_zip': 'Credit Card Billing Zip Code',
       'credit_card_month': 'Credit Card Exp Month',
-      'credit_card_year': 'Credit Card Exp Year',
-      'cart_address_line_one': 'Address Street',
-      'cart_address_line_city': 'Address City',
-      'cart_address_line_state': 'Address State',
-      'cart_address_line_zip': 'Address Zip Code'
+      'credit_card_year': 'Credit Card Exp Year'
     };
+
+    if (retroduck.cart.hasShippedItems) {
+      requiredItems['cart_address_line_one'] = 'Address Street';
+      requiredItems['cart_address_line_city'] = 'Address City';
+      requiredItems['cart_address_line_state'] = 'Address State';
+      requiredItems['cart_address_line_zip'] = 'Address Zip';
+    }
 
     for (var field in form) {
       if (!form[field] && requiredItems[field]) {
@@ -910,7 +913,6 @@ retroduck.cart = {
            .click(function() {
              $('.whiteOut').click();
            })));
-
 
     // Show whiteout div for use as offclick.
     $('.whiteOut')
@@ -1398,17 +1400,272 @@ retroduck.cart = {
     cart = JSON.parse(cart);
     var total = retroduck.cart.grandTotal;
     var form = retroduck.cart.formObject;
-    console.log(total, form);
-    console.log(cart);
 
-    // assemble the order and create object
-    // charge card
-    // store order if successful, deliver message if not
+    var msg = retroduck.msg.CONFIRM_CARD_MESSAGE;
+    retroduck.utils.successMessage(msg);
+
+    // Make a stub of the form in the format that Stripe asks for.
+    var fakeForm = {
+      'number': form.credit_card_number,
+      'cvc': form.credit_card_cvc,
+      'exp-month': form.credit_card_month,
+      'exp-year': form.credit_card_year
+    };
+
+    // Disable cart button.
+    $('.cartPayButton').attr('disabled', true);
+
+    Stripe.setPublishableKey('pk_test_pLKjQO5p1uHUYiZ1pFTSp2iG');
+    Stripe.card.createToken(fakeForm, retroduck.cart.makeOrderPayment);
+  },
+
+  /**
+   * Make an order payment.
+   * @function that results from Stripe token request, and makes a new request
+   *           to our custom endpoint.
+   *
+   * @param form Object holds payment form details.
+   * @param res Object response from our server.
+   *
+   */
+  makeOrderPayment: function(form, res) {
+
+    // Case for a valid Stripe ID being returned.
+    if (res.id && !res.error) {
+
+      // Attach the stripe token to the payment request.
+      var form = retroduck.cart.formObject;
+      form.stripeToken = res.id
+      form.cart_total = retroduck.cart.grandTotal;
+
+      // Make the request.
+      $.ajax({
+        url: '/payment',
+        data: form,
+        type: 'POST',
+        success: function(res) {
+          if (res.success) {
+
+            // Enable cart button.
+            $('.cartPayButton').attr('disabled', false);
+
+            // Run success function.
+            retroduck.cart.postPaymentSuccess(res);
+          } else {
+            retroduck.utils.errorMessage('Error charging card.');
+          }
+        }
+      });
+
+    // Case for when Stripe does not return a valid token for us.  This will
+    } else {
+      var msg = 'There was an error with your card details: ' +
+        res.error.message;
+      retroduck.utils.errorMessage(msg);
+
+      // Enable cart button.
+      $('.cartPayButton').attr('disabled', false);
+
+    }
+  },
+
+  /**
+   * Runs after a successful payment is made.
+   * @function that stores details about a successful payment.
+   *
+   * @param stripeCharge Object from Stripe with charge details.
+   *
+   */
+  postPaymentSuccess: function(res) {
+    var cart = retroduck.utils.getOneCookie('cart');
+    cart = JSON.parse(cart);
+
+    for (var designId in cart.items) {
+      var item = cart.items[designId];
+
+      // A retail item will not have an order_id, only social order will.
+      if (item.order_id) {
+        retroduck.cart.storePurchasedItemsToOrder(
+          item.order_id, designId, item, res.formData.cart_total);
+      }
+    }
+
+    for (var orderPayments in cart.orderPayments) {
+      // TODO look here for how to process CUSTOM order payments.
+    }
+
+    // Lastly, store a new dbRetailOrder with all the cust, design and order info.
+
+    // then clear cart and formObject
+
+    // Either use uniqueId or create order conf #.
+
     // if order_id, apply items & payments to that order.
     // if custom order, apply payment to that order.
     // clear cart.
     // deliver user to confirmation page with their order conf #
     // Payments will have a conf #
+
+//      order structure
+
+  //    customerid
+    //  customerEmail
+    //  items
+    //  customOrderPayments
+
+    //  store payment, dbOrderPayment needs a retailOrderId object
+  },
+
+  /**
+   * Store items on an order.
+   * @function that updates order payments (custom orders) and stores orders
+   *           under a customer account.
+   *
+   * @param orderId String id of an order
+   * @param designId String id of the design
+   * @param item Object the cart item.
+   */
+  storePurchasedItemsToOrder: function(orderId, designId, item, total) {
+
+    // Build a query from the object type.
+    var DbObject = Parse.Object.extend('dbOrder');
+    var query = new Parse.Query(DbObject);
+
+    // Always sort newest first.
+    query.equalTo('objectId', orderId);
+
+    // Perform the queries and continue with the help of the callback functions.
+    query.find({
+        success: function(results) {
+          var order = results[0];
+          var orderItems = JSON.parse(order.attributes.items);
+          for (var i = 0; i < orderItems.length; i++) {
+            var orderItem = orderItems[i];
+            var paymentsAgainstOrder = 0;
+            if (orderItem.id == designId) {
+
+              var productPrice = orderItem.product_price;
+
+              // Now add the sizes from cart 'item' to this order item.
+              var sizesJustOrdered = item.sizes;
+              var orderSizes = orderItem.sizes;
+              for (var size in sizesJustOrdered) {
+                if (size !== 'length') {
+                  if (!orderSizes[size]) {
+                    orderSizes[size] = 0;
+                  }
+                  var quantity = sizesJustOrdered[size];
+                  paymentsAgainstOrder += (productPrice * quantity);
+                  orderSizes[size] = Number(orderSizes[size]) + Number(quantity);
+                }
+              }
+
+              // If this is a social order (has order_id), save a payment
+              // to the order/social order.
+              if (item.order_id) {
+
+                // Instantiate order log.
+                var DbObject = Parse.Object.extend('dbOrderPayment');
+                var pymnt = new DbObject();
+                var amt = String(Number(paymentsAgainstOrder).toFixed(2));
+
+                // Store order id, json and current user.
+                pymnt.set('order_id', item.order_id);
+                pymnt.set('amount', amt);
+                pymnt.set('method', 'card');
+                pymnt.set('user', retroduck.currentUser.id);
+                pymnt.set('user_email', retroduck.currentUser.attributes.email);
+
+                // Save the dang thing.
+                pymnt.save();
+              }
+            }
+          }
+
+          // Then stringify the resulting orderItems object, and
+          order.set('items', JSON.stringify(orderItems));
+          order.save().then(function() {
+             retroduck.cart.saveRetailOrderToDatabase(total);
+          });
+        },
+        error: function(error) {
+            console.log('failed to store order');
+        }
+    });
+  },
+
+  /**
+   * Saves a retail order to the database.
+   * @function that creates a retail order after someone purchases items.
+   *
+   */
+  saveRetailOrderToDatabase: function(total) {
+    var cart = retroduck.utils.getOneCookie('cart');
+
+    // Create a unique id for the order, separate from the Parse id.
+    var retailOrderId = retroduck.utils.guid().toUpperCase();
+
+    // Instantiate order log.
+    var DbObject = Parse.Object.extend('dbRetailOrder');
+    var retailOrder = new DbObject();
+    var amt = String(Number(total).toFixed(2));
+
+    var searchString = retroduck.currentUser.attributes.email + retailOrderId;
+
+    // Store order id, json and current user.
+    retailOrder.set('order_id', retailOrderId);
+    retailOrder.set('user', retroduck.currentUser.id);
+    retailOrder.set('user_email', retroduck.currentUser.attributes.email);
+    retailOrder.set('cart', cart);
+    retailOrder.set('parse_search_string', searchString);
+    retailOrder.set('total', amt);
+    retailOrder.set('paid', true);
+
+    // Save the dang thing.
+    retailOrder.save(null, {
+      success: function(result) {
+        console.log('saved order', result);
+        $('.whiteOut').hide();
+        $('.confirmCheckoutPopupDialog').hide();
+        retroduck.cart.successfulOrder(result);
+
+        // EMPTY CART
+        // EMPTY FORMOBJCTE
+        // Success page
+        // SEND EMAIL
+      },
+      error: function(result, error) {
+        console.log('error adding order', error.message);
+      }
+    });
+  },
+
+  successfulOrder: function(order) {
+    $('.shoppingCartPage').empty();
+    console.log(order, 'ORDER!');
+
+    var amtMsg = 'You just paid us $' + order.attributes.total;
+    var confNumberMsg = 'Your order number is: ' + order.attributes.order_id;
+
+    $('.shoppingCartPage')
+      .append($('<div>')
+        .attr('class', 'confirmOrderWrapper')
+        .append($('<h1>')
+          .html(retroduck.msg.ORDER_SUCCESS_HEADER))
+        .append($('<span>')
+          .attr('class', 'orderSuccessAmountMessage')
+          .html(amtMsg))
+        .append($('<h1>')
+          .attr('class', 'orderSuccessConfNumber')
+          .html(confNumberMsg)));
+
+    // order_id: "228138A2-AB1AB0C0"
+    // paid: true
+    // parse_search_string: "adam@wxmw.co228138A2-AB1AB0C0"
+    // total: "28.00"
+    // user: "q2NDMwWoCP"
+    // user_email: "adam@wxmw.co"
+
 
   },
 

@@ -38,6 +38,15 @@ retroduck.utils = {
      'MICHIGAN': 0.06
    },
 
+   guid: function() {
+     function s4() {
+       return Math.floor((1 + Math.random()) * 0x10000)
+         .toString(16)
+         .substring(1);
+     }
+     return s4() + s4() + '-' + s4() + s4();
+   },
+
    /** Launch a popup. **/
    launchPopup: function(classOfPopup) {
 
@@ -470,6 +479,18 @@ retroduck.utils = {
    /** Check if a user is present **/
    checkForUser: function() {
 
+     // Add logout button to menu
+     if (!$('.menuMyOrdersLink').length || $('.menuMyOrdersLink').length == 0) {
+       $('.menuLinksHolder')
+          .append($('<a>')
+            .attr('class', 'menuMyOrdersLink')
+            .attr('href', 'javascript:void(0)')
+            .html('My Orders')
+            .click(function() {
+              window.location = '/my_orders';
+            }));
+     }
+
      // Define user.
      retroduck.currentUser = Parse.User.current();
 
@@ -497,18 +518,6 @@ retroduck.utils = {
      if (retroduck.currentUser) {
 
        $('.menuMobileSignInLink').hide();
-
-       // Add logout button to menu
-       if (!$('.menuMyOrdersLink').length || $('.menuMyOrdersLink').length == 0) {
-         $('.menuLinksHolder')
-            .append($('<a>')
-              .attr('class', 'menuMyOrdersLink')
-              .attr('href', 'javascript:void(0)')
-              .html('My Orders')
-              .click(function() {
-                window.location = '/my_orders';
-              }));
-       }
 
        // Add logout button to menu
        if (!$('.menuLogoutLink').length || $('.menuLogoutLink').length == 0) {
@@ -559,7 +568,6 @@ retroduck.utils = {
      } else {
        $('.userMenuIcon').hide();
        $('.menuLogoutLink').remove();
-       $('.menuMyOrdersLink').remove();
        $('.userSignInIcon')
          .show()
          .click(function() {

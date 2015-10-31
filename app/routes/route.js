@@ -16,6 +16,9 @@ var requests 			= require('../requests');
 // Rendering module.
 var render  			= require('../render');
 
+// Payments module.
+var payments 			= require('../payments');
+
 // Main route module.
 module.exports = function(app) {
 
@@ -50,6 +53,12 @@ module.exports = function(app) {
 
 		// Render the user order page.
 		render.myOrders(res);
+	});
+
+	app.post('/payment', function(req, res) {
+		payments.makePayment(req.body, function(pymntResponse) {
+			res.json(pymntResponse);
+		});
 	});
 
 	//***********************
@@ -94,6 +103,19 @@ module.exports = function(app) {
 		render.socialOrder(orderId, res);
 	});
 
+	//***********************
+	//***********************
+	//**** SEARCH RESULTS ***
+	//***********************
+	//***********************
+	app.get('/search/:searchTerm', function(req, res) {
+
+		// Search term.
+		var searchTerm = req.params.searchTerm;
+
+		// Render search results.
+		render.performSearch(res, searchTerm);
+	});
 
 	//***********************
 	//***********************

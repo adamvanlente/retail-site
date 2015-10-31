@@ -236,7 +236,7 @@ retroduck.myOrders = {
        .html('')
        .append($('<span>')
          .attr('class', 'myOrdersNoCustomerLoggedIn')
-         .html('Please log in to see your orders.')
+         .html('Click here to login and see your orders.')
          .click(function() {
            retroduck.utils.launchCustomerSigninForm();
          }));
